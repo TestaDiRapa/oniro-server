@@ -2,11 +2,8 @@ from flask import Flask
 from pymongo import MongoClient
 
 app = Flask(__name__)
+client = MongoClient()
 
-
-@app.route('/')
-def index():
-    return "Hello, World!"
 
 
 if __name__ == "__main__":
