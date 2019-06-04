@@ -84,4 +84,4 @@ api.add_resource(DoctorLogin, "/login/doctor")
 api.add_resource(DoctorRegister, "/register/doctor")
 
 if __name__ == "__main__":
-    app.run('0.0.0.0', 8080, True)
+    app.run('0.0.0.0', 8080)
