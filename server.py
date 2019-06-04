@@ -9,12 +9,12 @@ app = Flask(__name__)
 api = Api(app)
 
 # Initialize mongo client
-with open("mongourl.secret") as url_file:
+with open("/root/oniro-server/mongourl.secret") as url_file:
     app.config["MONGO_URI"] = url_file.read()[:-1]
     mongo = PyMongo(app)
 
 # Initialize JWT
-with open("jwt.secret") as key_file:
+with open("/root/oniro-server/jwt.secret") as key_file:
     app.config["JWT_SECRET_KEY"] = key_file.read()[:-1]
     jwt = JWTManager(app)
 
@@ -84,4 +84,4 @@ api.add_resource(DoctorLogin, "/login/doctor")
 api.add_resource(DoctorRegister, "/register/doctor")
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", 8080, True)
+    app.run('0.0.0.0', 8080, True)
