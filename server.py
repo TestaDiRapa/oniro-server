@@ -30,6 +30,7 @@ def login(user_type):
     if user_type != "user" and user_type != "doctor":
         return make_response("error", 404)
 
+    key = ""
     if user_type == "user":
         key = "cf"
     elif user_type == "doctor":
@@ -53,11 +54,11 @@ def login(user_type):
         if not sha256.verify(params["password"], pwd):
             return error_message("password is not correct")
 
-        access_token = create_access_token({"id": params[key], "type": "user"})
+        access_token = create_access_token({"username": params[key], "type": "user"})
         return jsonify(status="ok", access_token=access_token)
 
-    except:
-        return make_response("error", 500)
+    except Exception as e:
+        return make_response(str(e), 500)
 
 
 @app.route("/register/user", methods=['PUT'])
@@ -124,11 +125,11 @@ def register_doctor():
             }
         )
 
-        access_token = create_access_token({"id": json_data["id"], "type": "doctor"})
+        access_token = create_access_token({"username": json_data["id"], "type": "doctor"})
         return jsonify(status="ok", access_token=access_token)
 
-    except:
-        return make_response("error", 500)
+    except Exception as e:
+        return make_response(str(e), 500)
 
 
 @app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])
@@ -151,10 +152,10 @@ def subscribe_to_doctor():
         if doctor is None:
             return error_message("this doctor does not exists!")
 
-        elif claims["id"] in doctor["patients"]:
+        elif claims["username"] in doctor["patients"]:
             return error_message("already a patient of this doctor")
 
-        elif claims["id"] in doctor["patient_requests"]:
+        elif claims["username"] in doctor["patient_requests"]:
             return error_message("already sent a message to this doctor")
 
         mongo.db.doctors.update_one(
@@ -162,14 +163,14 @@ def subscribe_to_doctor():
                 "_id": params["doctor_id"]
             },
             {
-                "$push": {"patient_requests": claims["id"]}
+                "$push": {"patient_requests": claims["username"]}
             }
         )
 
         return jsonify(status="ok")
 
-    except:
-        return make_response("error", 500)
+    except Exception as e:
+        return make_response(str(e), 500)
 
 
 @app.route("/doctor/accept_patient", methods=['POST'])
@@ -187,11 +188,11 @@ def accept_patient():
         return error_message("user_cf is a mandatory parameter")
 
     try:
-        user = mongo.db.users.find_one({'_id':params["user_cf"]})
+        user = mongo.db.users.find_one({'_id': params["user_cf"]})
         if user is None:
             return error_message("user does not exists")
 
-        doctor = mongo.db.doctors.find_one({'_id': claims["id"]})
+        doctor = mongo.db.doctors.find_one({'_id': claims["username"]})
 
         if doctor is None:
             return error_message("doctor does not exists")
@@ -214,8 +215,8 @@ def accept_patient():
 
         return jsonify(status="ok")
 
-    except:
-        return make_response("error", 500)
+    except Exception as e:
+        return make_response(str(e), 500)
 
 
 if __name__ == "__main__":
