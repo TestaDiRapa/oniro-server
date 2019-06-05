@@ -62,7 +62,7 @@ def my_doctors_get(claims, mongo):
 
     except Exception as e:
         print(e)
-        return make_response(str(e.with_traceback()), 500)
+        return make_response(str(e), 500)
 
 
 def my_doctors_post(params, claims, mongo):
