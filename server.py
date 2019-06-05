@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request, make_response
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_claims
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
 from utils import error_message
+from user.my_doctors import my_doctors_post, my_doctors_get
 
 app = Flask(__name__)
+CORS(app)
 
 # Initialize mongo client
 with open("/root/oniro-server/mongourl.secret") as url_file:
@@ -134,43 +137,18 @@ def register_doctor():
 
 @app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])
 @jwt_required
-def subscribe_to_doctor():
+def my_doctors():
     params = request.get_json(silent=True, cache=False)
-    if params is None:
-        return error_message("mime type not accepted")
-
     claims = get_jwt_claims()
-    if claims["type"] != "user":
-        return error_message("only users can subscribe to doctors!")
 
-    if "doctor_id" not in params:
-        return error_message("doctor id is a mandatory parameter")
+    if request.method == 'GET':
+        return my_doctors_get(claims, mongo)
 
-    try:
-        doctor = mongo.db.doctors.find_one({'_id': params["doctor_id"]})
+    if request.method == 'POST':
+        return my_doctors_post(params, claims, mongo)
 
-        if doctor is None:
-            return error_message("this doctor does not exists!")
-
-        elif claims["username"] in doctor["patients"]:
-            return error_message("already a patient of this doctor")
-
-        elif claims["username"] in doctor["patient_requests"]:
-            return error_message("already sent a message to this doctor")
-
-        mongo.db.doctors.update_one(
-            {
-                "_id": params["doctor_id"]
-            },
-            {
-                "$push": {"patient_requests": claims["username"]}
-            }
-        )
-
-        return jsonify(status="ok")
-
-    except Exception as e:
-        return make_response(str(e), 500)
+    if request.method == 'DELETE':
+        pass
 
 
 @app.route("/doctor/accept_patient", methods=['POST'])
