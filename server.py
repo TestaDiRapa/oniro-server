@@ -88,7 +88,7 @@ def register_user():
             }
         )
 
-        access_token = create_access_token({"id": json_data["cf"], "type": "user"})
+        access_token = create_access_token({"username": json_data["cf"], "type": "user"})
         return jsonify(status="ok", access_token=access_token)
 
     except Exception as e:
