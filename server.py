@@ -30,24 +30,29 @@ def login(user_type):
     if user_type != "user" and user_type != "doctor":
         return make_response("error", 404)
 
+    if user_type == "user":
+        key = "cf"
+    elif user_type == "doctor":
+        key = "id"
+
     params = request.get_json(silent=True)
     if params is None:
         return error_message("wrong parameters")
 
-    if "cf" not in params or "password" not in params:
-        return error_message("username and password are mandatory fields!")
+    if key not in params or "password" not in params:
+        return error_message("id and password are mandatory fields!")
 
     try:
-        user = mongo.db[user_type+"s"].find_one({"_id": params["cf"]})
+        user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
 
         if user is None:
-            return error_message("user doesn't exists!")
+            return error_message("user does not exists!")
 
         pwd = user["password"]
         if not sha256.verify(params["password"], pwd):
             return error_message("password is not correct")
 
-        access_token = create_access_token({"username": params["cf"], "type": "user"})
+        access_token = create_access_token({"id": params[key], "type": "user"})
         return jsonify(status="ok", access_token=access_token)
 
     except:
@@ -82,7 +87,7 @@ def register_user():
             }
         )
 
-        access_token = create_access_token({"username": json_data["cf"], "type": "user"})
+        access_token = create_access_token({"id": json_data["cf"], "type": "user"})
         return jsonify(status="ok", access_token=access_token)
 
     except:
@@ -107,7 +112,7 @@ def register_doctor():
 
         mongo.db.users.insert_one(
             {
-                "_id": json_data["if"],
+                "_id": json_data["id"],
                 "email": json_data["email"],
                 "password": sha256.hash(json_data["password"]),
                 "name": json_data["name"],
@@ -118,7 +123,7 @@ def register_doctor():
             }
         )
 
-        access_token = create_access_token({"username": json_data["cf"], "type": "doctor"})
+        access_token = create_access_token({"id": json_data["id"], "type": "doctor"})
         return jsonify(status="ok", access_token=access_token)
 
     except:
@@ -129,6 +134,9 @@ def register_doctor():
 @jwt_required
 def subscribe_to_doctor():
     params = request.get_json(silent=True, cache=False)
+    if params is None:
+        return error_message("mime type not accepted")
+
     claims = get_jwt_claims()
     if claims["type"] != "user":
         return error_message("only users can subscribe to doctors!")
@@ -137,15 +145,15 @@ def subscribe_to_doctor():
         return error_message("doctor id is a mandatory parameter")
 
     try:
-        result = mongo.db.doctors.find_one({'_id': params["doctor_id"]})
+        doctor = mongo.db.doctors.find_one({'_id': params["doctor_id"]})
 
-        if result is None:
-            return error_message("this doctor doesn't exists!")
+        if doctor is None:
+            return error_message("this doctor does not exists!")
 
-        elif claims["username"] in result["patients"]:
+        elif claims["id"] in doctor["patients"]:
             return error_message("already a patient of this doctor")
 
-        elif claims["username"] in result["patient_requests"]:
+        elif claims["id"] in doctor["patient_requests"]:
             return error_message("already sent a message to this doctor")
 
         mongo.db.doctors.update_one(
@@ -153,7 +161,7 @@ def subscribe_to_doctor():
                 "_id": params["doctor_id"]
             },
             {
-                "$push": {"patient_requests": claims["username"]}
+                "$push": {"patient_requests": claims["id"]}
             }
         )
 
@@ -162,6 +170,52 @@ def subscribe_to_doctor():
     except:
         return make_response("error", 500)
 
+
+@app.route("/doctor/accept_patient", methods=['POST'])
+@jwt_required
+def accept_patient():
+    params = request.get_json(silent=True, cache=False)
+    if params is None:
+        return error_message("mime type not accepted")
+
+    claims = get_jwt_claims()
+    if claims["type"] != "doctor":
+        return error_message("only doctors are allowed to accept patients!")
+
+    if "user_cf" not in params:
+        return error_message("user_cf is a mandatory parameter")
+
+    try:
+        user = mongo.db.users.find_one({'_id':params["user_cf"]})
+        if user is None:
+            return error_message("user does not exists")
+
+        doctor = mongo.db.doctors.find_one({'_id': claims["id"]})
+
+        if doctor is None:
+            return error_message("doctor does not exists")
+
+        if params["user_cf"] in doctor["patients"]:
+            return error_message("patient already accepted")
+
+        if params["user_cf"] not in doctor["patient_requests"]:
+            return error_message("patient did not sent a request")
+
+        mongo.db.doctors.update_one(
+            {
+                "_id": claims["id"]
+            },
+            {
+                "$pull": {"patient_requests": params["user_cf"]},
+                "$push": {"patients": params["user_cf"]}
+            }
+        )
+
+        return jsonify(status="ok")
+
+    except:
+        return make_response("error", 500)
+    
 
 if __name__ == "__main__":
     app.run('0.0.0.0', 8080)
