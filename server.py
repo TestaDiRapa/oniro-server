@@ -30,7 +30,28 @@ def add_claims_to_access_token(data):
 class UserLogin(Resource):
 
     def get(self):
-        pass
+        params = request.get_json(silent=True)
+        if params is None:
+            return error_message("wrong parameters")
+
+        if "cf" not in params or "password" not in params:
+            return error_message("username and password are mandatory fields!")
+
+        try:
+            user = mongo.db.users.find_one({"_id": params["cf"]})
+
+            if user is None:
+                return error_message("user doesn't exists!")
+
+            pwd = user["password"]
+            if not sha256.verify(params["password"], pwd):
+                return error_message("password is not correct")
+
+            access_token = create_access_token({"username": params["cf"], "type": "user"})
+            return jsonify(status="ok", access_token=access_token)
+
+        except:
+            return error_message("error in database connection!")
 
 
 class UserRegister(Resource):
@@ -48,34 +69,80 @@ class UserRegister(Resource):
 
         try:
             if mongo.db.users.find_one({'_id': json_data["cf"]}) is not None:
-                return error_message("A user with this CF already exists!")
+                return error_message("a user with this CF already exists!")
 
             mongo.db.users.insert_one(
                 {
                     '_id': json_data['cf'],
                     'email': json_data['email'],
-                    # MUST BE VERIFIED WITH sha256.verify(password, hash)
                     'password': sha256.hash(json_data["password"])
                 }
             )
 
             access_token = create_access_token({"username": json_data["cf"], "type": "user"})
-            return jsonify(status="ok", payload={"access_token": access_token})
+            return jsonify(status="ok", access_token=access_token)
 
         except:
-            return error_message("Error in database connection")
+            return error_message("error in database connection")
 
 
 class DoctorLogin(Resource):
 
     def get(self):
-        pass
+        params = request.get_json(silent=True)
+        if params is None:
+            return error_message("wrong parameters")
+
+        if "cf" not in params or "password" not in params:
+            return error_message("username and password are mandatory fields!")
+
+        try:
+            user = mongo.db.doctors.find_one({"_id": params["cf"]})
+
+            if user is None:
+                return error_message("user doesn't exists!")
+
+            pwd = user["password"]
+            if not sha256.verify(params["password"], pwd):
+                return error_message("password is not correct")
+
+            access_token = create_access_token({"username": params["cf"], "type": "doctor"})
+            return jsonify(status="ok", access_token=access_token)
+
+        except:
+            return error_message("error in database connection!")
 
 
 class DoctorRegister(Resource):
 
     def put(self):
-        pass
+        json_data = request.get_json(silent=True, cache=False)
+        if json_data is None:
+            return error_message("mime type not accepted")
+
+        fields = ["cf", "email", "password"]
+
+        for field in fields:
+            if field not in json_data:
+                return error_message(field + " is a mandatory field")
+
+        try:
+            if mongo.db.doctors.find_one({'_id': json_data["cf"]}) is not None:
+                return error_message("a user with this CF already exists!")
+
+            mongo.db.users.insert_one(
+                {
+                    '_id': json_data['cf'],
+                    'email': json_data['email'],
+                    'password': sha256.hash(json_data["password"])
+                }
+            )
+
+            access_token = create_access_token({"username": json_data["cf"], "type": "doctor"})
+            return jsonify(status="ok", access_token=access_token)
+
+        except:
+            return error_message("error in database connection")
 
 
 api.add_resource(UserLogin, "/login/user")
