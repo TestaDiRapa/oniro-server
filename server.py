@@ -27,9 +27,6 @@ def add_claims_to_access_token(data):
 
 @app.route('/login/<string:user_type>', methods=['GET'])
 def login(user_type):
-    if request.method != 'GET':
-        return make_response("error", 405)
-
     if user_type != "user" and user_type != "doctor":
         return make_response("error", 404)
 
@@ -96,7 +93,7 @@ def register_user():
 
 
 @app.route("/register/doctor", methods=['PUT'])
-def put():
+def register_doctor():
     if request.method != "PUT":
         return make_response("error", 405)
 
