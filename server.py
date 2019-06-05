@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
 from utils import error_message
-from user.my_doctors import my_doctors_post, my_doctors_get
+from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
 
 app = Flask(__name__)
 CORS(app)
@@ -148,7 +148,7 @@ def my_doctors():
         return my_doctors_post(params, claims, mongo)
 
     if request.method == 'DELETE':
-        pass
+        return my_doctors_delete(request.args.get("doctor_id"), claims, mongo)
 
 
 @app.route("/doctor/accept_patient", methods=['POST'])

@@ -10,12 +10,31 @@ def my_doctors_delete(doctor_id, claims, mongo):
         return error_message("only users can delete a their subscription to a doctor!")
 
     try:
-        doctor = mongo.db.find_one({'_id': doctor_id})
+        doctor = mongo.db.doctors.find_one({'_id': doctor_id})
         if doctor is None:
             return error_message("doctor does not exists!")
 
         if claims["username"] not in doctor["patients"] and claims["username"] not in doctor["patient_requests"]:
             return error_message("you are not subscribed or asked for subscription to this doctor")
+
+        mongo.db.doctors.update_one(
+            {
+                '_id': doctor_id
+            },
+            {
+                "$pull": {"patients": claims["username"]}
+            }
+        )
+        mongo.db.doctors.update_one(
+            {
+                '_id': doctor_id
+            },
+            {
+                "$pull": {"patient_requests": claims["username"]}
+            }
+        )
+
+        return jsonify(status="ok")
 
     except Exception as e:
         return make_response(str(e), 500)
@@ -28,7 +47,16 @@ def my_doctors_get(claims, mongo):
     try:
         results = []
         for document in mongo.db.doctors.find({'patients': claims["username"]}):
-            results.append(document['_id'])
+            results.append({
+                "doctor": document['_id'],
+                "type": "subscribed"
+            })
+
+        for document in mongo.db.doctors.find({'patient_requests': claims["username"]}):
+            results.append({
+                "doctor": document['_id'],
+                "type": "requested"
+            })
 
         return jsonify(status="ok", results=results)
 
