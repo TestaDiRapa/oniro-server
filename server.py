@@ -1,3 +1,4 @@
+from commons import me_get, me_post
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
@@ -134,6 +135,19 @@ def register_doctor():
 
     except Exception as e:
         return make_response(str(e), 500)
+
+
+@app.route("/me", methods=['GET', 'POST'])
+@jwt_required
+def me():
+    params = request.get_json(silent=True, cache=False)
+    claims = get_jwt_claims()
+
+    if request.method == 'GET':
+        return me_get(claims, mongo)
+
+    if request.method == 'POST':
+        return me_post(params, claims, mongo)
 
 
 @app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])
