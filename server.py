@@ -1,3 +1,4 @@
+from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_claims
@@ -151,50 +152,20 @@ def my_doctors():
         return my_doctors_delete(request.args.get("doctor_id"), claims, mongo)
 
 
-@app.route("/doctor/accept_patient", methods=['POST'])
+@app.route("/doctor/my_patients", methods=['GET', 'DELETE', 'POST'])
 @jwt_required
-def accept_patient():
+def my_patients():
     params = request.get_json(silent=True, cache=False)
-    if params is None:
-        return error_message("mime type not accepted")
-
     claims = get_jwt_claims()
-    if claims["type"] != "doctor":
-        return error_message("only doctors are allowed to accept patients!")
 
-    if "user_cf" not in params:
-        return error_message("user_cf is a mandatory parameter")
+    if request.method == 'GET':
+        return my_patients_get(claims, mongo)
 
-    try:
-        user = mongo.db.users.find_one({'_id': params["user_cf"]})
-        if user is None:
-            return error_message("user does not exists")
+    if request.method == 'POST':
+        return my_patients_post(params, claims, mongo)
 
-        doctor = mongo.db.doctors.find_one({'_id': claims["identity"]})
-
-        if doctor is None:
-            return error_message("doctor does not exists")
-
-        if params["user_cf"] in doctor["patients"]:
-            return error_message("patient already accepted")
-
-        if params["user_cf"] not in doctor["patient_requests"]:
-            return error_message("patient did not sent a request")
-
-        mongo.db.doctors.update_one(
-            {
-                "_id": claims["identity"]
-            },
-            {
-                "$pull": {"patient_requests": params["user_cf"]},
-                "$push": {"patients": params["user_cf"]}
-            }
-        )
-
-        return jsonify(status="ok")
-
-    except Exception as e:
-        return make_response(str(e), 500)
+    if request.method == 'DELETE':
+        return my_patients_delete(request.args.get("patient_cf"), claims, mongo)
 
 
 if __name__ == "__main__":

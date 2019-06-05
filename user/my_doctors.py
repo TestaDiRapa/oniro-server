@@ -14,7 +14,7 @@ def my_doctors_delete(doctor_id, claims, mongo):
         if doctor is None:
             return error_message("doctor does not exists!")
 
-        if claims["username"] not in doctor["patients"] and claims["username"] not in doctor["patient_requests"]:
+        if claims["identity"] not in doctor["patients"] and claims["identity"] not in doctor["patient_requests"]:
             return error_message("you are not subscribed or asked for subscription to this doctor")
 
         mongo.db.doctors.update_one(
