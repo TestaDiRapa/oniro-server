@@ -35,9 +35,10 @@ def login(user_type):
     elif user_type == "doctor":
         key = "id"
 
-    params = request.get_json(silent=True)
-    if params is None:
-        return error_message("wrong parameters")
+    params = {
+        key: request.args.get(key),
+        "password": request.args.get("password")
+    }
 
     if key not in params or "password" not in params:
         return error_message("id and password are mandatory fields!")
@@ -130,7 +131,7 @@ def register_doctor():
         return make_response("error", 500)
 
 
-@app.route("/user/subscribe_to_doctor", methods=['POST'])
+@app.route("/user/my_doctors", methods=['POST'])
 @jwt_required
 def subscribe_to_doctor():
     params = request.get_json(silent=True, cache=False)
@@ -215,7 +216,7 @@ def accept_patient():
 
     except:
         return make_response("error", 500)
-    
+
 
 if __name__ == "__main__":
     app.run('0.0.0.0', 8080)
