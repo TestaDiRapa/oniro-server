@@ -22,7 +22,7 @@ def my_doctors_delete(doctor_id, claims, mongo):
                 '_id': doctor_id
             },
             {
-                "$pull": {"patients": claims["username"]}
+                "$pull": {"patients": claims["identity"]}
             }
         )
         mongo.db.doctors.update_one(
@@ -30,7 +30,7 @@ def my_doctors_delete(doctor_id, claims, mongo):
                 '_id': doctor_id
             },
             {
-                "$pull": {"patient_requests": claims["username"]}
+                "$pull": {"patient_requests": claims["identity"]}
             }
         )
 
@@ -44,16 +44,15 @@ def my_doctors_get(claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can subscribe to doctors!")
 
-    return jsonify(tmp=claims)
     try:
         results = []
-        for document in mongo.db.doctors.find({'patients': claims["username"]}):
+        for document in mongo.db.doctors.find({'patients': claims["identity"]}):
             results.append({
                 "doctor": document['_id'],
                 "type": "subscribed"
             })
 
-        for document in mongo.db.doctors.find({'patient_requests': claims["username"]}):
+        for document in mongo.db.doctors.find({'patient_requests': claims["identity"]}):
             results.append({
                 "doctor": document['_id'],
                 "type": "requested"
@@ -81,10 +80,10 @@ def my_doctors_post(params, claims, mongo):
         if doctor is None:
             return error_message("this doctor does not exists!")
 
-        elif claims["username"] in doctor["patients"]:
+        elif claims["identity"] in doctor["patients"]:
             return error_message("already a patient of this doctor")
 
-        elif claims["username"] in doctor["patient_requests"]:
+        elif claims["identity"] in doctor["patient_requests"]:
             return error_message("already sent a message to this doctor")
 
         mongo.db.doctors.update_one(
@@ -92,7 +91,7 @@ def my_doctors_post(params, claims, mongo):
                 "_id": params["doctor_id"]
             },
             {
-                "$push": {"patient_requests": claims["username"]}
+                "$push": {"patient_requests": claims["identity"]}
             }
         )
 

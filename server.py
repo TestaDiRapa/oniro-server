@@ -170,7 +170,7 @@ def accept_patient():
         if user is None:
             return error_message("user does not exists")
 
-        doctor = mongo.db.doctors.find_one({'_id': claims["username"]})
+        doctor = mongo.db.doctors.find_one({'_id': claims["identity"]})
 
         if doctor is None:
             return error_message("doctor does not exists")
@@ -183,7 +183,7 @@ def accept_patient():
 
         mongo.db.doctors.update_one(
             {
-                "_id": claims["id"]
+                "_id": claims["identity"]
             },
             {
                 "$pull": {"patient_requests": params["user_cf"]},
