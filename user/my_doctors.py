@@ -44,6 +44,7 @@ def my_doctors_get(claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can subscribe to doctors!")
 
+    return jsonify(tmp="ok")
     try:
         results = []
         for document in mongo.db.doctors.find({'patients': claims["username"]}):
@@ -61,7 +62,6 @@ def my_doctors_get(claims, mongo):
         return jsonify(status="ok", results=results)
 
     except Exception as e:
-        print(e)
         return make_response(str(e), 500)
 
 
