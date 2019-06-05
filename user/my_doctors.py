@@ -44,7 +44,7 @@ def my_doctors_get(claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can subscribe to doctors!")
 
-    return jsonify(tmp="ok")
+    return jsonify(tmp=claims)
     try:
         results = []
         for document in mongo.db.doctors.find({'patients': claims["username"]}):
