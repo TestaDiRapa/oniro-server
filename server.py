@@ -91,8 +91,8 @@ def register_user():
         access_token = create_access_token({"id": json_data["cf"], "type": "user"})
         return jsonify(status="ok", access_token=access_token)
 
-    except:
-        return make_response("error", 500)
+    except Exception as e:
+        return make_response(str(e), 500)
 
 
 @app.route("/register/doctor", methods=['PUT'])
@@ -131,7 +131,7 @@ def register_doctor():
         return make_response("error", 500)
 
 
-@app.route("/user/my_doctors", methods=['POST'])
+@app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])
 @jwt_required
 def subscribe_to_doctor():
     params = request.get_json(silent=True, cache=False)
