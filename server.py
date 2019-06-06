@@ -117,7 +117,7 @@ def register_doctor():
         if mongo.db.doctors.find_one({'_id': json_data["id"]}) is not None:
             return error_message("a user with this id already exists!")
 
-        mongo.db.users.insert_one(
+        mongo.db.doctors.insert_one(
             {
                 "_id": json_data["id"],
                 "email": json_data["email"],
