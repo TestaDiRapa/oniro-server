@@ -4,6 +4,7 @@ from utils import error_message
 
 def me_get(claims, mongo):
     collection = "users"
+    return jsonify(ok="ok")
     if claims["type"] == "doctor":
         collection = "doctors"
 
