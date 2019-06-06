@@ -60,7 +60,8 @@ def login(user_type):
             return error_message("password is not correct")
 
         access_token = create_access_token({"username": params[key], "type": "user"})
-        return jsonify(status="ok", access_token=access_token)
+
+        return jsonify(status="ok", access_token=access_token, message=user)
 
     except Exception as e:
         return make_response(str(e), 500)
