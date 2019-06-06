@@ -61,7 +61,7 @@ def login(user_type):
 
         access_token = create_access_token({"username": params[key], "type": "user"})
 
-        return jsonify(status="ok", access_token=access_token, message=user)
+        return jsonify(status="ok", access_token=access_token)
 
     except Exception as e:
         return make_response(str(e), 500)
