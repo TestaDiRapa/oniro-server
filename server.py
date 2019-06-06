@@ -59,7 +59,7 @@ def login(user_type):
         if not sha256.verify(params["password"], pwd):
             return error_message("password is not correct")
 
-        access_token = create_access_token({"username": params[key], "type": "user"})
+        access_token = create_access_token({"username": params[key], "type": user_type})
 
         return jsonify(status="ok", access_token=access_token)
 
