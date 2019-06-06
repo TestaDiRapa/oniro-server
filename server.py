@@ -107,7 +107,7 @@ def register_doctor():
     if json_data is None:
         return error_message("mime type not accepted")
 
-    fields = ["id", "email", "password", "name", "surname", "address"]
+    fields = ["id", "email", "password", "name", "surname", "address", "phone"]
 
     for field in fields:
         if field not in json_data:
@@ -125,6 +125,7 @@ def register_doctor():
                 "name": json_data["name"],
                 "surname": json_data["surname"],
                 "address": json_data["address"],
+                "phone": json_data["phone"],
                 "patients": [],
                 "patient_requests": []
             }
