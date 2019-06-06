@@ -12,10 +12,10 @@ def me_get(claims, mongo):
         ret = {}
 
         for key in document:
-            if key != "_id" and key != "password":
+            if key != "password":
                 ret[key] = document[key]
 
-        return jsonify(status="ok", payload=ret)
+        return jsonify(status="ok", message=ret)
 
     except Exception as e:
         return error_message(str(e), 500)
