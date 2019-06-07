@@ -15,8 +15,7 @@ def habits_post(params, claims, mongo):
 
     try:
         today = date.today().strftime("%d/%m/%Y")
-        cf = claims["identity"]
-        mongo.db[cf].find_one_and_update(
+        mongo.db[claims["identity"]].find_one_and_update(
             {
                 "_id": today,
                 "type": "habit"
