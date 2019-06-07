@@ -8,8 +8,7 @@ def habits_post(params, claims, mongo):
     if claims["type"] != "user":
         return error_message("Only users can add habits!")
 
-    #fields = ["caffe", "drink", "isSport", "isCena"]
-    fields = []
+    fields = ["caffe", "drink", "isSport", "isCena"]
     for field in fields:
         if field not in params:
             return error_message(field+" is a mandatory parameter!")
@@ -17,8 +16,7 @@ def habits_post(params, claims, mongo):
     try:
         today = date.today().strftime("%d/%m/%Y")
         cf = claims["identity"]
-        return jsonify(status=cf)
-        mongo.db[claims["identity"]].insert_one_and_update(
+        mongo.db[cf].insert_one_and_update(
             {
                 "_id": today,
                 "type": "habit"
