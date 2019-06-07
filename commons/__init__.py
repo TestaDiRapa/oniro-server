@@ -47,6 +47,7 @@ def me_post(params, claims, mongo, image=None):
             return error_message("error in media server, message: " + r.json()["message"])
 
         else:
+            return jsonify(r.json())
             update["profile_picture"] = r.json()["path"]
 
     try:

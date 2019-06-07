@@ -143,7 +143,6 @@ def register_doctor():
 @app.route("/me", methods=['GET', 'POST'])
 @jwt_required
 def me():
-    params = request.get_json(silent=True, cache=False)
     claims = get_jwt_claims()
 
     if request.method == 'GET':
