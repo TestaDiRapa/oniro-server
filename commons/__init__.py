@@ -35,19 +35,18 @@ def me_post(params, claims, mongo, image=None):
     update = dict()
 
     if image is not None:
-        files = {"file": image.read()}
+        files = {"file": image.read(), "user": claims["identity"]}
         headers = {"content-type": "multipart/form-data"}
-        payload = {"user": claims["identity"]}
-        r = requests.post(url="http://localhost:8082/mediaserver", data=payload, files=files, headers=headers)
+        # payload = {"user": claims["identity"]}
+        r = requests.post(url="http://localhost:8082/mediaserver", files=files, headers=headers)
 
         if r.status_code != 200:
             return error_message("error in media server, code: " + str(r.status_code))
 
-        elif "error" in r.json():
+        elif r.json()["status"] == "error":
             return error_message("error in media server, message: " + r.json()["message"])
 
         else:
-            return jsonify(r.json())
             update["profile_picture"] = r.json()["path"]
 
     try:
