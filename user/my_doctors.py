@@ -58,7 +58,7 @@ def my_doctors_get(claims, mongo):
                 "type": "requested"
             })
 
-        return jsonify(status="ok", results=results)
+        return jsonify(status="ok", message=results)
 
     except Exception as e:
         return make_response(str(e), 500)
