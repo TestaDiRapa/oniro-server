@@ -150,7 +150,11 @@ def me():
         return me_get(claims, mongo)
 
     if request.method == 'POST':
-        return me_post(params, claims, mongo)
+        file = None
+        if "image" in request.files:
+            file = request.files["image"]
+
+        return me_post(request.form, claims, mongo, file)
 
 
 @app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])
