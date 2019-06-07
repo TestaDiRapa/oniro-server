@@ -11,7 +11,7 @@ def habits_post(params, claims, mongo):
     if "habit" not in params:
         return error_message("habit is a mandatory parameter!")
 
-    fields = ["coffee", "drink", "isSport", "isDinner"]
+    fields = ["caffe", "drink", "isSport", "isCena"]
     for field in fields:
         if field not in params["habit"]:
             return error_message(field+" is a mandatory parameter!")
@@ -26,10 +26,10 @@ def habits_post(params, claims, mongo):
             {
                 "$set": {
                     "type": "habit",
-                    "coffee": params["coffee"],
+                    "coffee": params["caffe"],
                     "drink": params["drink"],
                     "isSport": params["isSport"],
-                    "isDinner": params["isDinner"]
+                    "isDinner": params["isCena"]
                 }
             },
             upsert=True
