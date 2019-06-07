@@ -31,6 +31,17 @@ def add_claims_to_access_token(data):
     }
 
 
+@app.route("/test", methods=["GET"])
+def test:
+    try:
+        coll = "test"
+        mongo.db.coll.insert_one({"_id":"ciao"})
+        return jsonify.(status="ok")
+
+    except Exception as e:
+        return error_message(str(e))
+
+
 @app.route('/login/<string:user_type>', methods=['GET'])
 def login(user_type):
     if user_type != "user" and user_type != "doctor":
