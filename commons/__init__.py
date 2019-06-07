@@ -1,5 +1,7 @@
 from flask import jsonify
+from passlib.hash import pbkdf2_sha256 as sha256
 from utils import error_message
+import requests
 
 
 def me_get(claims, mongo):
@@ -21,5 +23,58 @@ def me_get(claims, mongo):
         return error_message(str(e), 500)
 
 
-def me_post(params, claims, mongo):
-    return error_message("NOT IMPLEMENTED", 500)
+def me_post(params, claims, mongo, image=None):
+
+    collection = "users"
+    fields = ["age", "phone_number"]
+
+    if claims["type"] == "doctor":
+        collection = "doctors"
+        fields = ["address", "phone"]
+
+    update = dict()
+
+    if image is not None:
+        files = {"file": image.read()}
+        headers = {"content-type": "multipart/form-data"}
+        payload = {"user": claims["identity"]}
+        r = requests.post(url="http://localhost:8082/mediaserver", data=payload, files=files, headers=headers)
+
+        if r.status_code != 200:
+            return error_message("error in media server, code: " + str(r.status_code))
+
+        elif "error" in r.json():
+            return error_message("error in media server, message: " + r.json()["message"])
+
+        else:
+            update["profile_picture"] = r.json()["path"]
+
+    try:
+        if "old_password" in params and "new_password" in params:
+            document = mongo.db[collection].find_one({'_id': claims["identity"]})
+
+            if document is not None and sha256.verify(params["old_password"], document["password"]):
+                update["password"] = sha256.hash(params["new_password"])
+
+        for field in fields:
+            if field in params:
+                update[field] = params[field]
+
+        if update:
+            mongo.db[collection].find_one_and_update(
+                {
+                    "_id": claims["identity"]
+                },
+                {
+                    "$set": update
+                }
+            )
+
+            return jsonify(status="ok")
+
+        else:
+            return error_message("no data provided!")
+
+    except Exception as e:
+        return error_message(str(e))
+
