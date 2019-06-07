@@ -15,6 +15,8 @@ def habits_post(params, claims, mongo):
 
     try:
         today = date.today().strftime("%d/%m/%Y")
+        cf = claims["identity"]
+        return jsonify(status=cf)
         mongo.db[claims["identity"]].insert_one_and_update(
             {
                 "_id": today,
