@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
 from utils import error_message
+from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
 
 app = Flask(__name__)
@@ -166,6 +167,16 @@ def my_doctors():
 
     if request.method == 'DELETE':
         return my_doctors_delete(request.args.get("doctor_id"), claims, mongo)
+
+
+@app.route("/user/habits", methods=['PUT'])
+@jwt_required
+def habits():
+    params = request.get_json(silent=True, cache=False)
+    claims = get_jwt_claims()
+
+    if request.method == 'PUT':
+        return habits_post(params, claims, mongo)
 
 
 @app.route("/doctor/my_patients", methods=['GET', 'DELETE', 'POST'])
