@@ -8,12 +8,9 @@ def habits_post(params, claims, mongo):
     if claims["type"] != "user":
         return error_message("Only users can add habits!")
 
-    if "habit" not in params:
-        return error_message("habit is a mandatory parameter!")
-
     fields = ["caffe", "drink", "isSport", "isCena"]
     for field in fields:
-        if field not in params["habit"]:
+        if field not in params:
             return error_message(field+" is a mandatory parameter!")
 
     try:
