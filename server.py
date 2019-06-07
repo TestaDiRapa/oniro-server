@@ -32,11 +32,10 @@ def add_claims_to_access_token(data):
 
 
 @app.route("/test", methods=["GET"])
-def test:
+def test():
     try:
-        coll = "test"
-        mongo.db.coll.insert_one({"_id":"ciao"})
-        return jsonify.(status="ok")
+        mongo.db["test"].insert_one({"_id":"ciao"})
+        return jsonify(status="ok")
 
     except Exception as e:
         return error_message(str(e))
