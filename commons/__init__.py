@@ -30,16 +30,16 @@ def me_post(params, claims, mongo, image=None):
 
     if claims["type"] == "doctor":
         collection = "doctors"
-        fields = ["address", "phone"]
+        fields = ["address", "phone_number"]
 
     update = dict()
 
     if image is not None:
 
-        files = {"file": ("file.jpg", open("prova2-propic.jpg", "rb"))}
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        files = {"file": (image.filename, image)}
+
         payload = {"user": claims["identity"]}
-        r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload, headers=headers)
+        r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload)
 
         if r.status_code != 200:
             return error_message("error in media server, code: " + str(r.status_code))
