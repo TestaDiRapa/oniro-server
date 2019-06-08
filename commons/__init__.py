@@ -30,7 +30,7 @@ def me_post(params, claims, mongo, image=None):
 
     if claims["type"] == "doctor":
         collection = "doctors"
-        fields = ["address", "phone"]
+        fields = ["address", "phone_number"]
 
     update = dict()
 
