@@ -36,7 +36,7 @@ def me_post(params, claims, mongo, image=None):
 
     if image is not None:
         files = {"file": image.read()}
-        headers = {"content-type": "multipart/form-data"}
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         payload = {"user": claims["identity"]}
         r = requests.post(url="http://localhost:8082/mediaserver", data=payload, files=files, headers=headers)
 
