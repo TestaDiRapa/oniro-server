@@ -42,9 +42,8 @@ def me_post(params, claims, mongo, image=None):
         except Exception as e:
             return error_message(str(e))
 
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         payload = {"user": claims["identity"]}
-        r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload, headers=headers)
+        r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload)
 
         if r.status_code != 200:
             return error_message("error in media server, code: " + str(r.status_code))
