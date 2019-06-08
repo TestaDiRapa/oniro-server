@@ -35,8 +35,8 @@ def me_post(params, claims, mongo, image=None):
     update = dict()
 
     if image is not None:
-        return error_message(str(type(image)))
-        files = {"file": (image.filename, image.read())}
+
+        files = {"file": ("file.jpg", open("prova2-propic.jpg", "rb"))}
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         payload = {"user": claims["identity"]}
         r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload, headers=headers)
