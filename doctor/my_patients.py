@@ -17,18 +17,13 @@ def my_patients_delete(patient_cf, claims, mongo):
 
         mongo.db.doctors.update_one(
             {
-                '_id': claims["identity"]
+                "_id": claims["identity"]
             },
             {
-                "$pull": {"patients": patient_cf}
-            }
-        )
-        mongo.db.doctors.update_one(
-            {
-                '_id': doctor_id
-            },
-            {
-                "$pull": {"patient_requests": patient_cf}
+                "$pull": {
+                    "patients": patient_cf,
+                    "patient_requests": patient_cf
+                }
             }
         )
 
