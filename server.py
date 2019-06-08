@@ -184,7 +184,7 @@ def get_coordinates():
                 }
             ))
         if len(response) == 0:
-            return error_message("Lista vuota")
+            return error_message("empty list!")
         return jsonify(status='ok', payload=response)
 
     except Exception as e:
