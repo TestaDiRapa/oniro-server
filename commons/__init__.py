@@ -37,7 +37,7 @@ def me_post(params, claims, mongo, image=None):
     if image is not None:
         files = {"file": image.read()}
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        r = requests.post(url="http://localhost:8082/mediaserver/"+claims["identity"], data=payload, files=files, headers=headers)
+        r = requests.post(url="http://localhost:8082/mediaserver/"+claims["identity"], files=files, headers=headers)
 
         if r.status_code != 200:
             return error_message("error in media server, code: " + str(r.status_code))
