@@ -177,7 +177,7 @@ def my_doctors():
 def get_coordinates():
     response = []
     # , {"_id": 1, "address": 1}
-    for x in mongo.db.doctors.find({}):
+    for x in mongo.db.doctors.find():
         return jsonify(boh=x)
         response.append((
             {
