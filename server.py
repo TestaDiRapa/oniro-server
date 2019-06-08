@@ -172,21 +172,25 @@ def my_doctors():
         return my_doctors_delete(request.args.get("doctor_id"), claims, mongo)
 
 
-@app.route("/user/getcoordinates",methods=['GET'])
+@app.route("/user/getcoordinates", methods=['GET'])
 @jwt_required
 def get_coordinates():
-    response = []
-    # , {"_id": 1, "address": 1}
-    for x in mongo.db.doctors.find():
-        return jsonify(boh=x)
-        response.append((
-            {
-                "address": x
-            }
-        ))
-    if len(response) == 0:
-        return error_message("Lista vuota")
-    return jsonify(status='ok', payload=response)
+    try:
+        response = []
+        # , {"_id": 1, "address": 1}
+        for x in mongo.db.doctors.find():
+            return jsonify(boh=x)
+            response.append((
+                {
+                    "address": x
+                }
+            ))
+        if len(response) == 0:
+            return error_message("Lista vuota")
+        return jsonify(status='ok', payload=response)
+
+    except Exception as e:
+        return error_message(str(e))
 
 
 @app.route("/user/habits", methods=['PUT'])
