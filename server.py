@@ -171,20 +171,21 @@ def my_doctors():
     if request.method == 'DELETE':
         return my_doctors_delete(request.args.get("doctor_id"), claims, mongo)
 
+
 @app.route("/user/getcoordinates",methods=['GET'])
 @jwt_required
 def get_coordinates():
     response=[]
-    for x in mongo.db.doctors.find({},{"_id": 1, "address": 1}):
+    for x in mongo.db.doctors.find({}, {"_id": 1, "address": 1}):
+        return jsonify(boh=x)
         response.append((
             {
-                "address" : x
+                "address": x
             }
         ))
     if len(response) == 0:
         return error_message("Lista vuota")
-    return jsonify(status='ok',payload=response)
-
+    return jsonify(status='ok', payload=response)
 
 
 @app.route("/user/habits", methods=['PUT'])
