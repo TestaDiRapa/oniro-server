@@ -171,6 +171,13 @@ def my_doctors():
     if request.method == 'DELETE':
         return my_doctors_delete(request.args.get("doctor_id"), claims, mongo)
 
+@app.route("/user/getcoordinates",methods=['GET'])
+@jwt_required
+def get_coordinates():
+    response=[]
+    for x in mongo.db.doctors.find({},{"_id":0,"address":1}):
+        response.append(x)
+    return jsonify(status="ok",payload=response)
 
 @app.route("/user/habits", methods=['PUT'])
 @jwt_required
