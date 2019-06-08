@@ -175,8 +175,12 @@ def my_doctors():
 @jwt_required
 def get_coordinates():
     response=[]
-    for x in mongo.db.doctors.find({},{"_id":0,"address":1}):
-        response.append(x)
+    for x in mongo.db.doctors.find({},{"_id": 1, "address": 1}):
+        response.append((
+            {
+                "address" : x
+            }
+        ))
     if len(response) == 0:
         return error_message("Lista vuota")
     return error_message(print(response))
