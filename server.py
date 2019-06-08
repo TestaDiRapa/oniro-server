@@ -175,8 +175,9 @@ def my_doctors():
 @app.route("/user/getcoordinates",methods=['GET'])
 @jwt_required
 def get_coordinates():
-    response=[]
-    for x in mongo.db.doctors.find({}, {"_id": 1, "address": 1}):
+    response = []
+    # , {"_id": 1, "address": 1}
+    for x in mongo.db.doctors.find({}):
         return jsonify(boh=x)
         response.append((
             {
