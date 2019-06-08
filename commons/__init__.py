@@ -37,7 +37,7 @@ def me_post(params, claims, mongo, image=None):
     if image is not None:
 
         try:
-            files = {"file": ("file.jpg", open("/root/oniro-server/prova2-propic.jpg", "rb"))}
+            files = {"file": (image.filename, image)}
 
         except Exception as e:
             return error_message(str(e))
