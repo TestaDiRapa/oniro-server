@@ -177,7 +177,11 @@ def get_coordinates():
     response=[]
     for x in mongo.db.doctors.find({},{"_id":0,"address":1}):
         response.append(x)
-    return jsonify(status="ok",payload=response)
+    if len(response) == 0:
+        return error_message("Lista vuota")
+    return error_message(print(response))
+
+
 
 @app.route("/user/habits", methods=['PUT'])
 @jwt_required
@@ -187,6 +191,7 @@ def habits():
 
     if request.method == 'PUT':
         return habits_post(params, claims, mongo)
+
 
 
 @app.route("/doctor/my_patients", methods=['GET', 'DELETE', 'POST'])
