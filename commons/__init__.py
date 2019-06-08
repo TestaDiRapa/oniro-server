@@ -36,11 +36,7 @@ def me_post(params, claims, mongo, image=None):
 
     if image is not None:
 
-        try:
-            files = {"file": (image.filename, image)}
-
-        except Exception as e:
-            return error_message(str(e))
+        files = {"file": (image.filename, image)}
 
         payload = {"user": claims["identity"]}
         r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload)
