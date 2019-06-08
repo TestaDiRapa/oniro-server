@@ -183,7 +183,7 @@ def get_coordinates():
         ))
     if len(response) == 0:
         return error_message("Lista vuota")
-    return error_message(print(response))
+    return jsonify(status='ok',payload=response)
 
 
 
