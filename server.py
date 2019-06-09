@@ -50,12 +50,12 @@ def login(user_type):
         return error_message("password is a mandatory parameter")
 
     params = {
-        key: str(request.args.get(key)),
+        key: request.args.get(key),
         "password": request.args.get("password")
     }
 
     try:
-        user = mongo.db.doctors.find_one({"_id": params[key]})
+        user = mongo.db.doctors.find_one({"_id": 55555})
 
         if user is None:
             return error_message("user does not exists!")
