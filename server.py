@@ -50,14 +50,14 @@ def login(user_type):
         return error_message("password is a mandatory parameter")
 
     params = {
-        key: request.args.get(key),
+        key: int(request.args.get(key)),
         "password": request.args.get("password")
     }
 
-    return jsonify(typ=str(type(params[key])))
-
     try:
-        user = mongo.db[user_type+"s"].find_one({"_id": 55555})
+        user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
+
+        return jsonify(res=user)
 
         if user is None:
             return error_message("user does not exists!")
