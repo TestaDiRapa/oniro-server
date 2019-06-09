@@ -8,7 +8,7 @@ from passlib.hash import pbkdf2_sha256 as sha256
 from utils import error_message
 from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
-from user.my_recordings import my_recordings_get
+from user.my_recordings import my_recordings_put
 
 app = Flask(__name__)
 CORS(app)
@@ -224,7 +224,7 @@ def my_recordings():
     claims = get_jwt_claims()
 
     if request.methods == 'PUT':
-        return my_recordings_get(claims, params, mongo)
+        return my_recordings_put(claims, params, mongo)
 
 
 if __name__ == "__main__":
