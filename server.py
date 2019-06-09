@@ -54,6 +54,8 @@ def login(user_type):
         "password": request.args.get("password")
     }
 
+    return jsonify(typ=type(params[key]))
+
     try:
         user = mongo.db[user_type+"s"].find_one({"_id": 55555})
 
