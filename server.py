@@ -50,7 +50,7 @@ def login(user_type):
         return error_message("password is a mandatory parameter")
 
     params = {
-        key: request.args.get(key),
+        key: str(request.args.get(key)),
         "password": request.args.get("password")
     }
 
