@@ -178,11 +178,7 @@ def get_coordinates():
     try:
         response = []
         for x in mongo.db.doctors.find({}, {"_id": 1, "address": 1}):
-            response.append((
-                {
-                    "address": x
-                }
-            ))
+            response.append(x)
         if len(response) == 0:
             return error_message("empty list!")
         return jsonify(status='ok', payload=response)
