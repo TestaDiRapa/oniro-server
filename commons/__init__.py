@@ -54,8 +54,11 @@ def me_post(params, claims, mongo, image=None):
         if "old_password" in params and "new_password" in params:
             document = mongo.db[collection].find_one({'_id': claims["identity"]})
 
-            if document is not None and sha256.verify(params["old_password"], document["password"]):
-                update["password"] = sha256.hash(params["new_password"])
+            if document is not None:
+                if sha256.verify(params["old_password"], document["password"]):
+                    update["password"] = sha256.hash(params["new_password"])
+                else:
+                    return error_message("password is not correct")
 
         for field in fields:
             if field in params:

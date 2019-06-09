@@ -197,7 +197,6 @@ def habits():
         return habits_post(params, claims, mongo)
 
 
-
 @app.route("/doctor/my_patients", methods=['GET', 'DELETE', 'POST'])
 @jwt_required
 def my_patients():
