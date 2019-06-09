@@ -57,8 +57,6 @@ def login(user_type):
     try:
         user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
 
-        return jsonify(res=user)
-
         if user is None:
             return error_message("user does not exists!")
 
