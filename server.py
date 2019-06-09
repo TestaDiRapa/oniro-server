@@ -54,10 +54,8 @@ def login(user_type):
         "password": request.args.get("password")
     }
 
-    return jsonify(key=params[key], user=user_type)
-
     try:
-        user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
+        user = mongo.db.doctors.find_one({"_id": params[key]})
 
         if user is None:
             return error_message("user does not exists!")
