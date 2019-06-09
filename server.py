@@ -43,15 +43,18 @@ def login(user_type):
     elif user_type == "doctor":
         key = "id"
 
+    if request.args.get(key) is None:
+        return error_message(key + " is a mandatory parameter")
+
+    if request.args.get("password") is None:
+        return error_message("password is a mandatory parameter")
+
     params = {
         key: request.args.get(key),
         "password": request.args.get("password")
     }
 
-    return jsonify(ob=params)
-
-    if key not in params or "password" not in params:
-        return error_message("id and password are mandatory fields!")
+    return jsonify(key=params[key], user=user_type)
 
     try:
         user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
