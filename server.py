@@ -5,10 +5,10 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_claims
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
-from utils import error_message
+from commons.utils import error_message
 from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
-from user.my_recordings import my_recordings_put
+from user.my_recordings import my_recordings_put, processing
 
 app = Flask(__name__)
 CORS(app)
@@ -226,6 +226,15 @@ def my_recordings():
 
     if request.method == 'PUT':
         return my_recordings_put(params, claims, mongo)
+
+
+@app.route("/user/my_recordings/process", methods=['GET'])
+@jwt_required
+def process_recording():
+    claims = get_jwt_claims()
+    rec_id = request.args.get("id")
+
+    return processing(rec_id, claims, mongo)
 
 
 if __name__ == "__main__":

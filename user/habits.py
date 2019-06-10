@@ -1,6 +1,6 @@
 from datetime import date
 from flask import jsonify
-from utils import error_message
+from commons.utils import error_message
 
 
 def habits_post(params, claims, mongo):

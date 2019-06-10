@@ -1,5 +1,29 @@
 from flask import jsonify
-from utils import error_message
+from commons.utils import error_message
+
+
+def processing(rec_id, claims, mongo):
+
+    if claims["type"] != "user":
+        return error_message("only users can access their recordings!")
+
+    user = claims["identity"]
+
+    if rec_id is None:
+        return error_message("id is a mandatory parameter!")
+
+    try:
+        record = mongo.db[user].find_one({"_id": rec_id})
+
+        if record is None:
+            return error_message("no records with the specified id!")
+
+        spo2_rate = 4
+
+
+
+    except Exception as e:
+        return error_message(str(e))
 
 
 def my_recordings_put(params, claims, mongo):
