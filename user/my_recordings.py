@@ -35,7 +35,7 @@ def my_recordings_put(params, claims, mongo):
     if "oxy_event" in params and params["oxy_event"] is not None:
         update["$push"]["oxy_events"] = params["oxy_event"]
 
-    if "dia_events" and params["dia_events"] is not None:
+    if "dia_event" and params["dia_event"] is not None:
         update["$push"]["dia_events"] = params["dia_event"]
 
     try:
