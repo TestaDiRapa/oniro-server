@@ -198,7 +198,6 @@ def habits():
     claims = get_jwt_claims()
 
     if request.method == 'PUT':
-        return jsonify(p=params, c=claims)
         return habits_post(params, claims, mongo)
 
 
