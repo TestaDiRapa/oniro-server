@@ -13,7 +13,7 @@ def my_recordings_put(params, claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can send recordings")
 
-    fields = {"spo2", "oxy_events", "dia_events", "hr", "hr_raw"}
+    fields = {"spo2", "oxy_event", "dia_event", "hr", "hr_raw"}
 
     for field in fields:
         if field not in params:
