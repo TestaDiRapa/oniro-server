@@ -2,7 +2,7 @@ from flask import jsonify
 from utils import error_message
 
 
-def my_recordings_put(claims, params, mongo):
+def my_recordings_put(params, claims, mongo):
 
     if claims["type"] != "user":
         return error_message("only users can send recordings")
