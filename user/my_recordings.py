@@ -13,7 +13,7 @@ def my_recordings_put(params, claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can send recordings")
 
-    fields = {"spo2", "oxy_event", "dia_event", "hr", "raw_hr"}
+    fields = {"spo2", "hr", "raw_hr"}
 
     for field in fields:
         if field not in params:
@@ -22,22 +22,28 @@ def my_recordings_put(params, claims, mongo):
     if "timestamp" not in params:
         return error_message("timestamp is a mandatory parameter!")
 
+    update = {
+                "type": "recording",
+                "$push":
+                {
+                    "spo2": params["spo2"],
+                    "hr": params["hr"],
+                    "raw_hr": {"$each": params["hr_raw"]}
+                }
+            }
+
+    if "oxy_events" in params and params["oxy_events"] is not None:
+        update["$push"]["oxy_events"] = params["oxy_events"]
+
+    if "dia_events" and params["dia_events"] is not None:
+        update["$push"]["dia_events"] = params["dia_events"]
+
     try:
         mongo.db[claims["identity"]].find_one_and_update(
             {
                 "_id": params["timestamp"]
             },
-            {
-                "type": "recording",
-                "$push":
-                {
-                    "spo2": {"$each": params["spo2"]},
-                    "oxy_events": {"$each": params["oxy_events"]},
-                    "dia_events": {"$each": params["dia_events"]},
-                    "hr": {"$each": params["hr"]},
-                    "raw_hr": {"$each": params["hr_raw"]}
-                }
-            },
+            update,
             upsert=True
         )
 
