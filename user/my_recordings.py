@@ -9,39 +9,40 @@ def my_recordings_put(params, claims, mongo):
 
     fields = {"spo2", "hr", "raw_hr"}
 
-    for field in fields:
-        if field not in params:
-            return error_message("malformed data packet, " + field + " missing!")
+    for json in params:
+        for field in fields:
+            if field not in json:
+                return error_message("malformed data packet, " + field + " missing!")
 
-    if "timestamp" not in params:
-        return error_message("timestamp is a mandatory parameter!")
+        if "timestamp" not in json:
+            return error_message("timestamp is a mandatory parameter!")
 
-    update = {
-                "$set": {"type": "recording"},
-                "$push":
-                {
-                    "spo2": params["spo2"],
-                    "hr": params["hr"],
-                    "raw_hr": {"$each": params["raw_hr"]}
+        update = {
+                    "$set": {"type": "recording"},
+                    "$push":
+                    {
+                        "spo2": json["spo2"],
+                        "hr": json["hr"],
+                        "raw_hr": {"$each": json["raw_hr"]}
+                    }
                 }
-            }
 
-    if "oxy_event" in params and params["oxy_event"] is not None:
-        update["$push"]["oxy_events"] = params["oxy_event"]
+        if "oxy_event" in json and json["oxy_event"] is not None:
+            update["$push"]["oxy_events"] = json["oxy_event"]
 
-    if "dia_event" and params["dia_event"] is not None:
-        update["$push"]["dia_events"] = params["dia_event"]
+        if "dia_event" and json["dia_event"] is not None:
+            update["$push"]["dia_events"] = json["dia_event"]
 
-    try:
-        mongo.db[claims["identity"]].find_one_and_update(
-            {
-                "_id": params["timestamp"]
-            },
-            update,
-            upsert=True
-        )
+        try:
+            mongo.db[claims["identity"]].find_one_and_update(
+                {
+                    "_id": json["timestamp"]
+                },
+                update,
+                upsert=True
+            )
 
-        return jsonify(status="ok")
+        except Exception as e:
+            return error_message(str(e))
 
-    except Exception as e:
-        return error_message(str(e))
+    return jsonify(status="ok")
