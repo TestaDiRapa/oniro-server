@@ -32,11 +32,11 @@ def my_recordings_put(params, claims, mongo):
                 }
             }
 
-    if "oxy_events" in params and params["oxy_events"] is not None:
-        update["$push"]["oxy_events"] = params["oxy_events"]
+    if "oxy_event" in params and params["oxy_event"] is not None:
+        update["$push"]["oxy_events"] = params["oxy_event"]
 
     if "dia_events" and params["dia_events"] is not None:
-        update["$push"]["dia_events"] = params["dia_events"]
+        update["$push"]["dia_events"] = params["dia_event"]
 
     try:
         mongo.db[claims["identity"]].find_one_and_update(
