@@ -13,7 +13,7 @@ def my_recordings_put(params, claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can send recordings")
 
-    fields = {"spo2", "oxy_event", "dia_event", "hr", "hr_raw"}
+    fields = {"spo2", "oxy_event", "dia_event", "hr", "raw_hr"}
 
     for field in fields:
         if field not in params:
@@ -35,7 +35,7 @@ def my_recordings_put(params, claims, mongo):
                     "oxy_events": {"$each": params["oxy_events"]},
                     "dia_events": {"$each": params["dia_events"]},
                     "hr": {"$each": params["hr"]},
-                    "hr_raw": {"$each": params["hr_raw"]}
+                    "raw_hr": {"$each": params["hr_raw"]}
                 }
             },
             upsert=True
