@@ -1,14 +1,11 @@
 from flask import jsonify
 from utils import error_message
-from datetime import datetime
 
 
 def my_recordings_put(params, claims, mongo):
 
-    mongo.db["record"].insert_one({
-        '_id': datetime.now().timestamp(),
-        'pay': params
-    })
+    if params is None:
+        return error_message("No payload sent!")
 
     if claims["type"] != "user":
         return error_message("only users can send recordings")
