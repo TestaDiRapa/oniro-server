@@ -42,20 +42,28 @@ def my_patients_get(claims, mongo):
         doctor = mongo.db.doctors.find_one({'_id': claims["identity"]})
 
         for value in doctor["patients"]:
-            results.append(
-                {
-                    "patient": value,
-                    "type": "registered"
-                }
-            )
+            user = mongo.db.users.find_one({"_id": value})
+            if user is not None:
+                results.append(
+                    {
+                        "patient": value,
+                        "name": user["name"],
+                        "surname": user["surname"],
+                        "type": "registered"
+                    }
+                )
 
         for value in doctor["patient_requests"]:
-            results.append((
-                {
-                    "patient": value,
-                    "type": "request"
-                }
-            ))
+            user = mongo.db.users.find_one({"_id": value})
+            if user is not None:
+                results.append(
+                    {
+                        "patient": value,
+                        "name": user["name"],
+                        "surname": user["surname"],
+                        "type": "request"
+                    }
+                )
 
         return jsonify(status="ok", results=results)
 

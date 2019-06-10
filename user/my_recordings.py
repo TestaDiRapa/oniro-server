@@ -28,7 +28,7 @@ def my_recordings_put(params, claims, mongo):
                 {
                     "spo2": params["spo2"],
                     "hr": params["hr"],
-                    "raw_hr": {"$each": params["hr_raw"]}
+                    "raw_hr": {"$each": params["raw_hr"]}
                 }
             }
 
