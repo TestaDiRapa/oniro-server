@@ -8,7 +8,6 @@ from passlib.hash import pbkdf2_sha256 as sha256
 from utils import error_message
 from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
-from user.my_recordings import my_recordings_put
 
 app = Flask(__name__)
 CORS(app)
@@ -43,16 +42,13 @@ def login(user_type):
     elif user_type == "doctor":
         key = "id"
 
-    if request.args.get(key) is None:
-        return error_message(key + " is a mandatory parameter")
-
-    if request.args.get("password") is None:
-        return error_message("password is a mandatory parameter")
-
     params = {
         key: request.args.get(key),
         "password": request.args.get("password")
     }
+
+    if key not in params or "password" not in params:
+        return error_message("id and password are mandatory fields!")
 
     try:
         user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
@@ -125,7 +121,7 @@ def register_doctor():
 
         mongo.db.doctors.insert_one(
             {
-                "_id": str(json_data["id"]),
+                "_id": json_data["id"],
                 "email": json_data["email"],
                 "password": sha256.hash(json_data["password"]),
                 "name": json_data["name"],
@@ -182,7 +178,11 @@ def get_coordinates():
     try:
         response = []
         for x in mongo.db.doctors.find({}, {"_id": 1, "address": 1}):
-            response.append(x)
+            response.append((
+                {
+                    "address": x
+                }
+            ))
         if len(response) == 0:
             return error_message("empty list!")
         return jsonify(status='ok', payload=response)
@@ -198,6 +198,7 @@ def habits():
     claims = get_jwt_claims()
 
     if request.method == 'PUT':
+        return jsonify(p=params, c=claims)
         return habits_post(params, claims, mongo)
 
 
@@ -215,16 +216,6 @@ def my_patients():
 
     if request.method == 'DELETE':
         return my_patients_delete(request.args.get("patient_cf"), claims, mongo)
-
-
-@app.route("/user/my_recordings", methods=['PUT'])
-@jwt_required
-def my_recordings():
-    params = request.get_json(silent=True, cache=False)
-    claims = get_jwt_claims()
-
-    if request.methods == 'PUT':
-        return my_recordings_put(claims, params, mongo)
 
 
 if __name__ == "__main__":
