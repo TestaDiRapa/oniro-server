@@ -40,7 +40,15 @@ def prepare_packet(record):
         "spectral_density": ps
     }
 
-    apnea_events = aggregate_apnea_events(record["oxy_events"], record["dia_events"])
+    oxy_events = []
+    if "oxy_events" in record:
+        oxy_events = record["oxy_events"]
+
+    dia_events = []
+    if "oxy_events" in record:
+        dia_events = record["dia_events"]
+
+    apnea_events = aggregate_apnea_events(oxy_events, dia_events)
     avg = 0
     for event in apnea_events:
         avg += event["duration"]
