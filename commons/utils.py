@@ -50,9 +50,11 @@ def prepare_packet(record):
 
     apnea_events = aggregate_apnea_events(oxy_events, dia_events)
     avg = 0
-    for event in apnea_events:
-        avg += event["duration"]
-    avg = avg // len(apnea_events)
+    
+    if len(apnea_events) > 0:
+        for event in apnea_events:
+            avg += event["duration"]
+        avg = avg // len(apnea_events)
 
     aggregate["apnea_events"] = len(apnea_events)
     aggregate["avg_duration"] = avg
