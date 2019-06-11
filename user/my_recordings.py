@@ -18,12 +18,18 @@ def my_recordings_put(params, claims, mongo):
             return error_message("timestamp is a mandatory parameter!")
 
         update = {
-                    "$set": {"type": "recording"},
+                    "$set": {
+                        "type": "recording",
+                        "spo2_rate": json["spo2_rate"],
+                        "hr_rate": json["hr_rate"],
+                        "raw_hr_rate": json["raw_hr_rate"]
+                    },
                     "$push":
                     {
                         "spo2": json["spo2"],
                         "hr": json["hr"],
-                        "raw_hr": {"$each": json["raw_hr"]}
+                        "raw_hr": {"$each": json["raw_hr"]},
+                        "movement_count": json["movement_count"]
                     }
                 }
 
