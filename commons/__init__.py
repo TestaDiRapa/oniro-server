@@ -34,6 +34,10 @@ def me_post(params, claims, mongo, image=None):
 
     update = dict()
 
+    p = image is None
+
+    return error_message(str(p))
+
     if image is not None:
 
         files = {"file": (image.filename, image)}
