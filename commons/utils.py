@@ -6,6 +6,55 @@ from scipy.signal import periodogram
 from statistics import mean
 
 
+def prepare_packet(record):
+    aggregate = dict()
+    preview = dict()
+
+    aggregate["type"] = "aggregate"
+    preview["type"] = "preview"
+
+    aggregate["avg_spo2"] = mean(record["spo2"])
+    aggregate["plot_spo2"] = interval_avg(record["spo2"], record["spo2_rate"], 60)
+
+    preview["avg_spo2"] = aggregate["avg_spo2"]
+
+    aggregate["avg_hr"] = mean(record["hr"])
+    aggregate["plot_hr"] = interval_avg(record["hr"], record["hr_rate"], 60)
+
+    preview["avg_hr"] = aggregate["avg_hr"]
+
+    aggregate["total_movements"] = sum(record["movements_count"])
+    aggregate["plot_movements"] = record["movements_count"]
+
+    f, ps = spectral_analysis(record["spo2"], record["spo2_rate"])
+
+    aggregate["spo2_spectra"] = {
+        "frequencies": f,
+        "spectral_density": ps
+    }
+
+    f, ps = spectral_analysis(record["hr"], record["hr_rate"])
+
+    aggregate["hr_spectra"] = {
+        "frequencies": f,
+        "spectral_density": ps
+    }
+
+    apnea_events = aggregate_apnea_events(record["oxy_events"], record["dia_events"])
+    avg = 0
+    for event in apnea_events:
+        avg += event["duration"]
+    avg = avg // len(apnea_events)
+
+    aggregate["apnea_events"] = len(apnea_events)
+    aggregate["avg_duration"] = avg
+    aggregate["plot_apnea_events"] = apnea_events
+
+    preview["apnea_events"] = len(apnea_events)
+
+    return aggregate, preview
+
+
 def error_message(message):
     return jsonify(status="error", message=message)
 
