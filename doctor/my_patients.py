@@ -1,5 +1,5 @@
 from flask import jsonify, make_response
-from utils import error_message
+from commons.utils import error_message
 
 
 def my_patients_delete(patient_cf, claims, mongo):

@@ -1,6 +1,6 @@
 from flask import jsonify
 from passlib.hash import pbkdf2_sha256 as sha256
-from utils import error_message
+from commons.utils import error_message
 import requests
 
 
