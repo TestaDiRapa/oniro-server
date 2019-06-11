@@ -50,7 +50,7 @@ def prepare_packet(record):
 
     apnea_events = aggregate_apnea_events(oxy_events, dia_events)
     avg = 0
-    
+
     if len(apnea_events) > 0:
         for event in apnea_events:
             avg += event["duration"]
@@ -91,7 +91,9 @@ def spectral_analysis(signal, rate):
     ham = hamming(len(signal))
     ham_wdw = ham*signal
 
-    return periodogram(ham_wdw, 1/rate)
+    f, ps = periodogram(ham_wdw, 1 / rate)
+
+    return list(f), list(ps)
 
 
 def aggregate_apnea_events(oxy_events, dia_events):
