@@ -98,7 +98,7 @@ def processing(rec_id, claims, mongo):
             "spectral_density": ps
         }
 
-        f, ps = spectral_analysis(record["raw_hr"], record["raw_hr_rate"])
+        f, ps = spectral_analysis(record["hr"], record["hr_rate"])
 
         aggregate["hr_spectra"] = {
             "frequencies": f,
@@ -131,7 +131,7 @@ def my_recordings_put(params, claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can send recordings")
 
-    fields = {"spo2", "hr", "raw_hr"}
+    fields = {"spo2", "hr"}
 
     for json in params:
         for field in fields:
@@ -146,13 +146,11 @@ def my_recordings_put(params, claims, mongo):
                         "type": "recording",
                         "spo2_rate": json["spo2_rate"],
                         "hr_rate": json["hr_rate"],
-                        "raw_hr_rate": json["raw_hr_rate"]
                     },
                     "$push":
                     {
                         "spo2": json["spo2"],
                         "hr": json["hr"],
-                        "raw_hr": {"$each": json["raw_hr"]},
                         "movement_count": json["movement_count"]
                     }
                 }

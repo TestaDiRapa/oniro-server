@@ -49,7 +49,7 @@ def login(user_type):
     }
 
     if key not in params or "password" not in params:
-        return error_message("id and password are mandatory fields!")
+        return error_message(key +" and password are mandatory fields!")
 
     try:
         user = mongo.db[user_type+"s"].find_one({"_id": params[key]})

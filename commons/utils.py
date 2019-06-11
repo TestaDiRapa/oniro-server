@@ -3,6 +3,7 @@ from dateutil.parser import parser
 from flask import jsonify
 from numpy import hamming
 from scipy.signal import periodogram
+from statistics import mean
 
 
 def error_message(message):
@@ -20,7 +21,7 @@ def interval_avg(signal, rate, interval):
     i = 0
     agg_sig = []
     while i < approx_len:
-        agg_sig.append(signal[i:i+spi])
+        agg_sig.append(mean(signal[i:i+spi]))
         i += spi
 
     return agg_sig
@@ -45,7 +46,7 @@ def aggregate_apnea_events(oxy_events, dia_events):
         oxy_ev = oxy_events[oxy_i]
         dia_ev = dia_events[dia_i]
         o_time = parser().parse(oxy_ev["time"])
-        d_time = parser().parse(oxy_ev["time"])
+        d_time = parser().parse(dia_ev["time"])
 
         if o_time <= d_time:
             if o_time + timedelta(seconds=oxy_ev["duration"]) < d_time:
@@ -61,6 +62,7 @@ def aggregate_apnea_events(oxy_events, dia_events):
                     "duration": (oxy_ev["duration"]+dia_ev["duration"])//2,
                     "type": "consensus"
                 })
+                dia_i += 1
 
             oxy_i += 1
 
@@ -71,6 +73,7 @@ def aggregate_apnea_events(oxy_events, dia_events):
                     "duration": dia_ev["duration"],
                     "type": "diaphragm"
                 })
+                oxy_i += 1
 
             else:
                 ret.append({
