@@ -2,7 +2,8 @@ from commons import me_get, me_post
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, decode_token
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, decode_token, \
+    jwt_refresh_token_required, get_jwt_claims
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
 from commons.utils import error_message
@@ -32,12 +33,6 @@ def add_claims_to_access_token(data):
     }
 
 
-@app.route('/test', methods=['GET'])
-@jwt_required
-def test():
-    return jsonify(decode_token("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NjAzNTE4MjMsIm5iZiI6MTU2MDM1MTgyMywianRpIjoiMzIyZTllYTItNWExZS00Njk3LWI4YjQtYzMzOTc3MDQxMjVlIiwiZXhwIjoxNTYwMzUyNzIzLCJpZGVudGl0eSI6eyJ1c2VybmFtZSI6IlRFU1QiLCJ0eXBlIjoidXNlciJ9LCJmcmVzaCI6ZmFsc2UsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2NsYWltcyI6eyJpZGVudGl0eSI6IlRFU1QiLCJ0eXBlIjoidXNlciJ9fQ.LZAPNtcK6JKZbE6fOiJDKjzC-YL0oqx4mOGyJ-3cDbY"))
-
-
 @app.route('/login/<string:user_type>', methods=['GET'])
 def login(user_type):
     if user_type != "user" and user_type != "doctor":
@@ -55,7 +50,7 @@ def login(user_type):
     }
 
     if key not in params or "password" not in params:
-        return error_message(key +" and password are mandatory fields!")
+        return error_message(key + " and password are mandatory fields!")
 
     try:
         user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
@@ -68,8 +63,12 @@ def login(user_type):
             return error_message("password is not correct")
 
         access_token = create_access_token({"username": params[key], "type": user_type})
+        expiration = decode_token(access_token)["exp"]
+        r_token = create_refresh_token({"username": params[key], "type": user_type})
+        refresh_expiration = decode_token(r_token)["exp"]
 
-        return jsonify(status="ok", access_token=access_token)
+        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                       refresh_token_exp=refresh_expiration)
 
     except Exception as e:
         return make_response(str(e), 500)
@@ -105,7 +104,12 @@ def register_user():
         )
 
         access_token = create_access_token({"username": json_data["cf"], "type": "user"})
-        return jsonify(status="ok", access_token=access_token)
+        expiration = decode_token(access_token)["exp"]
+        r_token = create_refresh_token({"username": json_data["cf"], "type": "user"})
+        refresh_expiration = decode_token(refresh_token)["exp"]
+
+        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                       refresh_token_exp=refresh_expiration)
 
     except Exception as e:
         return make_response(str(e), 500)
@@ -143,10 +147,25 @@ def register_doctor():
         )
 
         access_token = create_access_token({"username": json_data["id"], "type": "doctor"})
-        return jsonify(status="ok", access_token=access_token)
+        expiration = decode_token(access_token)["exp"]
+        r_token = create_refresh_token({"username": json_data["id"], "type": "doctor"})
+        refresh_expiration = decode_token(refresh_token)["exp"]
+
+        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                       refresh_token_exp=refresh_expiration)
 
     except Exception as e:
         return make_response(str(e), 500)
+
+
+@app.route("/refresh", methods=['GET'])
+@jwt_refresh_token_required
+def refresh_token():
+    claims = get_jwt_claims()
+    access_token = create_access_token(claims)
+    expiration = decode_token(access_token)["exp"]
+
+    return jsonify(status="ok", access_token=access_token, access_token_exp=expiration)
 
 
 @app.route("/me", methods=['GET', 'POST'])
