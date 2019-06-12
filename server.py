@@ -93,7 +93,8 @@ def register_user():
                 "name": json_data["name"],
                 "surname": json_data["surname"],
                 "age": json_data["age"],
-                "phone_number": json_data["phone_number"]
+                "phone_number": json_data["phone_number"],
+                "profile_picture": ""
             }
         )
 
@@ -130,7 +131,8 @@ def register_doctor():
                 "address": json_data["address"],
                 "phone_number": json_data["phone_number"],
                 "patients": [],
-                "patient_requests": []
+                "patient_requests": [],
+                "profile_picture": ""
             }
         )
 
