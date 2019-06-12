@@ -3,7 +3,7 @@ from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, decode_token, \
-    jwt_refresh_token_required, get_jwt_claims
+    jwt_refresh_token_required, get_jwt_claims, get_jwt_identity
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
 from commons.utils import error_message
@@ -161,7 +161,7 @@ def register_doctor():
 @app.route("/refresh", methods=['GET'])
 @jwt_refresh_token_required
 def refresh_token():
-    claims = get_jwt_claims()
+    claims = get_jwt_identity()
     return jsonify(claims)
     access_token = create_access_token({"username": claims["identity"], "type": claims["type"]})
     expiration = decode_token(access_token)["exp"]
