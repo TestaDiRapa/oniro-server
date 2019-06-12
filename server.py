@@ -2,7 +2,7 @@ from commons import me_get, me_post
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_claims
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, decode_token
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
 from commons.utils import error_message
@@ -35,7 +35,7 @@ def add_claims_to_access_token(data):
 @app.route('/test', methods=['GET'])
 @jwt_required
 def test():
-    return jsonify(get_jwt_claims())
+    return jsonify(decode_token("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NjAzNTE4MjMsIm5iZiI6MTU2MDM1MTgyMywianRpIjoiMzIyZTllYTItNWExZS00Njk3LWI4YjQtYzMzOTc3MDQxMjVlIiwiZXhwIjoxNTYwMzUyNzIzLCJpZGVudGl0eSI6eyJ1c2VybmFtZSI6IlRFU1QiLCJ0eXBlIjoidXNlciJ9LCJmcmVzaCI6ZmFsc2UsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2NsYWltcyI6eyJpZGVudGl0eSI6IlRFU1QiLCJ0eXBlIjoidXNlciJ9fQ.LZAPNtcK6JKZbE6fOiJDKjzC-YL0oqx4mOGyJ-3cDbY"))
 
 
 @app.route('/login/<string:user_type>', methods=['GET'])
