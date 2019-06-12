@@ -146,6 +146,9 @@ def register_doctor():
 def me():
     claims = get_jwt_claims()
 
+    print(request)
+    return jsonify(s=request)
+
     if request.method == 'GET':
         return me_get(claims, mongo)
 
