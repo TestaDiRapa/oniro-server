@@ -41,7 +41,7 @@ def me_post(params, claims, mongo):
 
         image = base64.b64decode(params["image"])
 
-        files = {"file": ("image.png", image)}
+        files = {"file": ("image.jpg", image)}
 
         payload = {"user": claims["identity"]}
         r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload)
