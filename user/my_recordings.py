@@ -40,7 +40,7 @@ def my_recordings_get(identifier, cf, claims, mongo):
 
     else:
         try:
-            doc = mongo.db[user].find({"_id": identifier})
+            doc = mongo.db[user].find_one({"_id": identifier})
 
             if doc is None:
                 return error_message("recording does not exists!")
