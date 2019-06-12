@@ -2,6 +2,7 @@ from flask import jsonify
 from passlib.hash import pbkdf2_sha256 as sha256
 from commons.utils import error_message
 import base64
+import re
 import requests
 
 
@@ -39,7 +40,7 @@ def me_post(params, claims, mongo):
 
     if "image" in params:
 
-        image = base64.b64decode(params["image"])
+        image = base64.b64decode(re.sub('data:image/[a-z]{3,4};base64,', '', params["image"]))
 
         files = {"file": ("image.jpg", image)}
 
