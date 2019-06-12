@@ -31,6 +31,8 @@ def my_recordings_get(identifier, cf, claims, mongo):
 
             for document in mongo.db[user].find({"type": "recording"}, {"preview": 1}):
 
+                return jsonify(list(document.keys()))
+
                 ret.append({
                     "id": document["_id"],
                     "preview": document["preview"]
