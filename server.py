@@ -150,14 +150,7 @@ def me():
         return me_get(claims, mongo)
 
     if request.method == 'POST':
-        file = None
-
-        return jsonify(prova="prova", fuck=request.form["image"])
-
-        if "image" in request.files:
-            file = request.files["image"]
-
-        return me_post(request.form, claims, mongo, file)
+        return me_post(request.form, claims, mongo)
 
 
 @app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])
