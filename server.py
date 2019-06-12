@@ -162,8 +162,7 @@ def register_doctor():
 @jwt_refresh_token_required
 def refresh_token():
     claims = get_jwt_identity()
-    return jsonify(claims)
-    access_token = create_access_token({"username": claims["identity"], "type": claims["type"]})
+    access_token = create_access_token({"username": claims["username"], "type": claims["type"]})
     expiration = decode_token(access_token)["exp"]
 
     return jsonify(status="ok", access_token=access_token, access_token_exp=expiration)
