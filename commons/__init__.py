@@ -40,7 +40,7 @@ def me_post(params, claims, mongo):
 
     if "image" in params:
 
-        image = base64.b64decode(re.sub('data:image/[a-z]{3,4};base64,', '', params["image"]))
+        image = base64.b64decode(re.sub('^ *data:image/[a-z]{3,4};base64,', '', params["image"]))
 
         files = {"file": ("image.jpg", image)}
 
