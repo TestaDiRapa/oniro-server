@@ -26,21 +26,17 @@ def my_recordings_get(identifier, cf, claims, mongo):
         user = claims["identity"]
 
     if identifier is None:
-        #try:
+        try:
             ret = []
 
             for document in mongo.db[user].find({"type": "recording"}, {"preview": 1}):
 
-                ret.append({
-                    "id": document["_id"],
-                    "preview": document["preview"]
-
-                })
+                ret.append(document)
 
             return jsonify(status="ok", payload=ret)
 
-        #except Exception as e:
-         #   return error_message(str(e))
+        except Exception as e:
+            return error_message(str(e))
 
     else:
         try:
