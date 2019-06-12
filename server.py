@@ -152,7 +152,7 @@ def me():
     if request.method == 'POST':
         file = None
 
-        return jsonify(prova="prova", fuck=request.form.keys())
+        return jsonify(prova="prova", fuck=list(request.form.keys()))
 
         if "image" in request.files:
             file = request.files["image"]
