@@ -3,5 +3,8 @@ flask_cors
 flask_jwt_extended
 flask_pymongo
 flask-restful
+numpy
 passlib
+python-dateutil
 requests
+scipy

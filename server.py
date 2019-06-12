@@ -8,7 +8,7 @@ from passlib.hash import pbkdf2_sha256 as sha256
 from commons.utils import error_message
 from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
-from user.my_recordings import my_recordings_put, processing
+from user.my_recordings import my_recordings_get, my_recordings_put, processing
 
 app = Flask(__name__)
 CORS(app)
@@ -49,7 +49,7 @@ def login(user_type):
     }
 
     if key not in params or "password" not in params:
-        return error_message("id and password are mandatory fields!")
+        return error_message(key +" and password are mandatory fields!")
 
     try:
         user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
@@ -221,7 +221,7 @@ def my_patients():
         return my_patients_delete(request.args.get("patient_cf"), claims, mongo)
 
 
-@app.route("/user/my_recordings", methods=['PUT'])
+@app.route("/user/my_recordings", methods=['PUT', 'GET'])
 @jwt_required
 def my_recordings():
     params = request.get_json(silent=True)
@@ -229,6 +229,9 @@ def my_recordings():
 
     if request.method == 'PUT':
         return my_recordings_put(params, claims, mongo)
+
+    if request.method == 'GET':
+        return my_recordings_get(request.args.get("id"), request.args.get("cf"), claims, mongo)
 
 
 @app.route("/user/my_recordings/process", methods=['GET'])

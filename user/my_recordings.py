@@ -1,5 +1,53 @@
 from flask import jsonify
-from commons.utils import error_message
+from commons.utils import error_message, prepare_packet
+
+
+def my_recordings_get(identifier, cf, claims, mongo):
+
+    if claims["type"] == "doctor":
+        if cf is None:
+            return error_message("user is a mandatory parameter!")
+
+        try:
+            doc = mongo.db.doctors.find_one({'_id': claims["identity"]})
+
+            if doc is None:
+                return error_message("doctor is not registered!")
+
+            if cf not in doc["patients"]:
+                return error_message("patient not registered!")
+
+            user = cf
+
+        except Exception as e:
+            return error_message(str(e))
+
+    else:
+        user = claims["identity"]
+
+    if identifier is None:
+        try:
+            ret = []
+
+            for document in mongo.db[user].find({"type": "recording"}):
+                ret.append(document["preview"])
+
+            return jsonify(status="ok", payload=ret)
+
+        except Exception as e:
+            return error_message(str(e))
+
+    else:
+        try:
+            doc = mongo.db[user].find({"_id": identifier})
+
+            if doc is None:
+                return error_message("recording does not exists!")
+
+            return jsonify(status="ok", payload=doc["aggregate"])
+
+        except Exception as e:
+            return error_message(str(e))
 
 
 def processing(rec_id, claims, mongo):
@@ -18,9 +66,21 @@ def processing(rec_id, claims, mongo):
         if record is None:
             return error_message("no records with the specified id!")
 
-        spo2_rate = 4
+        aggregate, preview = prepare_packet(record)
 
+        mongo.db[user].find_one_and_update(
+            {
+                "_id": rec_id,
+            },
+            {
+                "$set": {
+                    "aggregate": aggregate,
+                    "preview": preview
+                }
+            }
+        )
 
+        return jsonify(status="ok")
 
     except Exception as e:
         return error_message(str(e))
@@ -31,7 +91,7 @@ def my_recordings_put(params, claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can send recordings")
 
-    fields = {"spo2", "hr", "raw_hr"}
+    fields = {"spo2", "hr"}
 
     for json in params:
         for field in fields:
@@ -42,12 +102,16 @@ def my_recordings_put(params, claims, mongo):
             return error_message("timestamp is a mandatory parameter!")
 
         update = {
-                    "$set": {"type": "recording"},
+                    "$set": {
+                        "type": "recording",
+                        "spo2_rate": json["spo2_rate"],
+                        "hr_rate": json["hr_rate"],
+                    },
                     "$push":
                     {
                         "spo2": json["spo2"],
                         "hr": json["hr"],
-                        "raw_hr": {"$each": json["raw_hr"]}
+                        "movements_count": json["movements_count"]
                     }
                 }
 
