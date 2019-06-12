@@ -14,6 +14,9 @@ from user.my_recordings import my_recordings_get, my_recordings_put, processing
 app = Flask(__name__)
 CORS(app)
 
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 10
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = 10
+
 # Initialize mongo client
 with open("/root/oniro-server/mongourl.secret") as url_file:
     app.config["MONGO_URI"] = url_file.read()[:-1]
