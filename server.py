@@ -32,6 +32,12 @@ def add_claims_to_access_token(data):
     }
 
 
+@app.route('/test', methods=['GET'])
+@jwt_required
+def test():
+    return jsonify(get_jwt_claims())
+
+
 @app.route('/login/<string:user_type>', methods=['GET'])
 def login(user_type):
     if user_type != "user" and user_type != "doctor":
