@@ -35,6 +35,8 @@ def me_post(params, claims, mongo):
 
     update = dict()
 
+    image_path = ""
+
     if "image" in params:
 
         image = base64.b64decode(params["image"])
@@ -52,6 +54,7 @@ def me_post(params, claims, mongo):
 
         else:
             update["profile_picture"] = r.json()["path"]
+            image_path = r.json()["path"]
 
     try:
         if "old_password" in params and "new_password" in params:
@@ -77,7 +80,7 @@ def me_post(params, claims, mongo):
                 }
             )
 
-            return jsonify(status="ok")
+            return jsonify(status="ok", message=image_path)
 
         else:
             return error_message("no data provided!")
