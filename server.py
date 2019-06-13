@@ -179,9 +179,7 @@ def me():
 
     if request.method == 'POST':
 
-        with open("/root/oniro-server/log.txt", "w") as log:
-            log.write(str("file" in request.files))
-
+        request.files["file"].save("/root/oniro-server/image.png")
         return me_post(request.form, claims, mongo)
 
 
