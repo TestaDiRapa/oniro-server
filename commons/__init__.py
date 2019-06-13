@@ -42,6 +42,8 @@ def me_post(params, claims, mongo):
 
         formatted_string = params["image"].split(',')[1]
 
+        formatted_string += "=" * (4 - len(formatted_string)%4)
+
         image = base64.b64decode(formatted_string)
 
         files = {"file": ("image.jpg", image)}
