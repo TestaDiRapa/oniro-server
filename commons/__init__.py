@@ -43,7 +43,7 @@ def me_post(params, claims, mongo):
         with open("image.txt", "w") as log:
             log.write(params["image"])
 
-        image = base64.b64decode(re.sub('^ *data:image/[a-z]{3,4};base64,', '', params["image"]))
+        image = base64.b64decode(params["image"].split(',')[1])
 
         files = {"file": ("image.jpg", image)}
 
