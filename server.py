@@ -106,7 +106,7 @@ def register_user():
         access_token = create_access_token({"username": json_data["cf"], "type": "user"})
         expiration = decode_token(access_token)["exp"]
         r_token = create_refresh_token({"username": json_data["cf"], "type": "user"})
-        refresh_expiration = decode_token(refresh_token)["exp"]
+        refresh_expiration = decode_token(r_token)["exp"]
 
         return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
                        refresh_token_exp=refresh_expiration)
@@ -149,7 +149,7 @@ def register_doctor():
         access_token = create_access_token({"username": json_data["id"], "type": "doctor"})
         expiration = decode_token(access_token)["exp"]
         r_token = create_refresh_token({"username": json_data["id"], "type": "doctor"})
-        refresh_expiration = decode_token(refresh_token)["exp"]
+        refresh_expiration = decode_token(r_token)["exp"]
 
         return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
                        refresh_token_exp=refresh_expiration)
