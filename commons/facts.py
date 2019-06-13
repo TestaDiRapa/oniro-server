@@ -1,6 +1,7 @@
 from commons.utils import error_message
 from flask import jsonify
 
+
 def facts_post(params, mongo):
 
     if params is None or "fact" not in params:
@@ -24,7 +25,7 @@ def facts_get(mongo):
         for document in mongo.db.facts.find():
             facts.append(document["text"])
 
-        return jsonify(status="ok", payload="facts")
+        return jsonify(status="ok", payload=facts)
 
     except Exception as e:
         return error_message(str(e))
