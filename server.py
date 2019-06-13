@@ -2,7 +2,8 @@ from commons import me_get, me_post
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_claims
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, decode_token, \
+    jwt_refresh_token_required, get_jwt_claims, get_jwt_identity
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
 from commons.utils import error_message
@@ -49,7 +50,7 @@ def login(user_type):
     }
 
     if key not in params or "password" not in params:
-        return error_message(key +" and password are mandatory fields!")
+        return error_message(key + " and password are mandatory fields!")
 
     try:
         user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
@@ -62,8 +63,12 @@ def login(user_type):
             return error_message("password is not correct")
 
         access_token = create_access_token({"username": params[key], "type": user_type})
+        expiration = decode_token(access_token)["exp"]
+        r_token = create_refresh_token({"username": params[key], "type": user_type})
+        refresh_expiration = decode_token(r_token)["exp"]
 
-        return jsonify(status="ok", access_token=access_token)
+        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                       refresh_token_exp=refresh_expiration)
 
     except Exception as e:
         return make_response(str(e), 500)
@@ -93,12 +98,18 @@ def register_user():
                 "name": json_data["name"],
                 "surname": json_data["surname"],
                 "age": json_data["age"],
-                "phone_number": json_data["phone_number"]
+                "phone_number": json_data["phone_number"],
+                "profile_picture": ""
             }
         )
 
         access_token = create_access_token({"username": json_data["cf"], "type": "user"})
-        return jsonify(status="ok", access_token=access_token)
+        expiration = decode_token(access_token)["exp"]
+        r_token = create_refresh_token({"username": json_data["cf"], "type": "user"})
+        refresh_expiration = decode_token(refresh_token)["exp"]
+
+        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                       refresh_token_exp=refresh_expiration)
 
     except Exception as e:
         return make_response(str(e), 500)
@@ -130,15 +141,31 @@ def register_doctor():
                 "address": json_data["address"],
                 "phone_number": json_data["phone_number"],
                 "patients": [],
-                "patient_requests": []
+                "patient_requests": [],
+                "profile_picture": ""
             }
         )
 
         access_token = create_access_token({"username": json_data["id"], "type": "doctor"})
-        return jsonify(status="ok", access_token=access_token)
+        expiration = decode_token(access_token)["exp"]
+        r_token = create_refresh_token({"username": json_data["id"], "type": "doctor"})
+        refresh_expiration = decode_token(refresh_token)["exp"]
+
+        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                       refresh_token_exp=refresh_expiration)
 
     except Exception as e:
         return make_response(str(e), 500)
+
+
+@app.route("/refresh", methods=['GET'])
+@jwt_refresh_token_required
+def refresh_token():
+    claims = get_jwt_identity()
+    access_token = create_access_token({"username": claims["username"], "type": claims["type"]})
+    expiration = decode_token(access_token)["exp"]
+
+    return jsonify(status="ok", access_token=access_token, access_token_exp=expiration)
 
 
 @app.route("/me", methods=['GET', 'POST'])
@@ -150,11 +177,7 @@ def me():
         return me_get(claims, mongo)
 
     if request.method == 'POST':
-        file = None
-        if "image" in request.files:
-            file = request.files["image"]
-
-        return me_post(request.form, claims, mongo, file)
+        return me_post(request.form, claims, mongo)
 
 
 @app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])

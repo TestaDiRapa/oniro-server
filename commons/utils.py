@@ -10,9 +10,6 @@ def prepare_packet(record):
     aggregate = dict()
     preview = dict()
 
-    aggregate["type"] = "aggregate"
-    preview["type"] = "preview"
-
     aggregate["avg_spo2"] = mean(record["spo2"])
     aggregate["plot_spo2"] = aggregate_on_interval(record["spo2"], record["spo2_rate"], 60)
 

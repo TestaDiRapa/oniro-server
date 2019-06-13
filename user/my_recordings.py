@@ -29,8 +29,9 @@ def my_recordings_get(identifier, cf, claims, mongo):
         try:
             ret = []
 
-            for document in mongo.db[user].find({"type": "recording"}):
-                ret.append(document["preview"])
+            for document in mongo.db[user].find({"type": "recording"}, {"preview": 1}):
+
+                ret.append(document)
 
             return jsonify(status="ok", payload=ret)
 
@@ -39,7 +40,7 @@ def my_recordings_get(identifier, cf, claims, mongo):
 
     else:
         try:
-            doc = mongo.db[user].find({"_id": identifier})
+            doc = mongo.db[user].find_one({"_id": identifier})
 
             if doc is None:
                 return error_message("recording does not exists!")

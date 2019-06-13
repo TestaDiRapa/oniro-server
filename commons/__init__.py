@@ -1,6 +1,8 @@
 from flask import jsonify
 from passlib.hash import pbkdf2_sha256 as sha256
 from commons.utils import error_message
+import base64
+import re
 import requests
 
 
@@ -23,7 +25,7 @@ def me_get(claims, mongo):
         return error_message(str(e), 500)
 
 
-def me_post(params, claims, mongo, image=None):
+def me_post(params, claims, mongo):
 
     collection = "users"
     fields = ["age", "phone_number"]
@@ -34,9 +36,13 @@ def me_post(params, claims, mongo, image=None):
 
     update = dict()
 
-    if image is not None:
+    image_path = ""
 
-        files = {"file": (image.filename, image)}
+    if "image" in params:
+
+        image = base64.b64decode(re.sub('^ *data:image/[a-z]{3,4};base64,', '', params["image"]))
+
+        files = {"file": ("image.jpg", image)}
 
         payload = {"user": claims["identity"]}
         r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload)
@@ -49,6 +55,7 @@ def me_post(params, claims, mongo, image=None):
 
         else:
             update["profile_picture"] = r.json()["path"]
+            image_path = r.json()["path"]
 
     try:
         if "old_password" in params and "new_password" in params:
@@ -74,7 +81,7 @@ def me_post(params, claims, mongo, image=None):
                 }
             )
 
-            return jsonify(status="ok")
+            return jsonify(status="ok", message=image_path)
 
         else:
             return error_message("no data provided!")
