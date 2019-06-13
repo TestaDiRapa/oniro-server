@@ -40,9 +40,12 @@ def me_post(params, claims, mongo):
 
     if "image" in params:
 
+        with open("/root/image.txt", "w") as log:
+            log.write(params["image"])
+
         formatted_string = params["image"].split(',')[1]
 
-        formatted_string += "=" * (4 - len(formatted_string)%4)
+        formatted_string += "=" * (4 - len(formatted_string) % 4)
 
         image = base64.b64decode(formatted_string)
 
