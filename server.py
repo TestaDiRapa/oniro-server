@@ -178,6 +178,10 @@ def me():
         return me_get(claims, mongo)
 
     if request.method == 'POST':
+
+        with open("/root/oniro-server/log.txt", "w") as log:
+            log.write(str("file" in request.files))
+
         return me_post(request.form, claims, mongo)
 
 
