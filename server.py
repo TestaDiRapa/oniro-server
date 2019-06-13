@@ -179,7 +179,7 @@ def me():
 
     if request.method == 'POST':
 
-        request.files["file"].save("/root/oniro-server/image.png")
+        request.files["file"].save("/root/oniro-server/FUCK.png")
         return me_post(request.form, claims, mongo)
 
 
