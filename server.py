@@ -1,4 +1,6 @@
 from commons import me_get, me_post
+from commons.facts import facts_get, facts_post
+from commons.utils import error_message
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
@@ -6,7 +8,6 @@ from flask_jwt_extended import JWTManager, create_access_token, create_refresh_t
     jwt_refresh_token_required, get_jwt_claims, get_jwt_identity
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
-from commons.utils import error_message
 from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
 from user.my_recordings import my_recordings_get, my_recordings_put, processing
@@ -261,6 +262,17 @@ def process_recording():
     rec_id = request.args.get("id")
 
     return processing(rec_id, claims, mongo)
+
+
+@app.route("/facts", methods=['GET', 'POST'])
+def add_fact():
+    params = request.get_json(silent=True)
+
+    if request.method == 'GET':
+        return facts_get(mongo)
+
+    if request.method == 'POST':
+        return facts_post(params, mongo)
 
 
 if __name__ == "__main__":
