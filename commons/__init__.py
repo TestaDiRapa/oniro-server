@@ -2,7 +2,6 @@ from flask import jsonify
 from passlib.hash import pbkdf2_sha256 as sha256
 from commons.utils import error_message
 import base64
-import re
 import requests
 
 
@@ -25,7 +24,7 @@ def me_get(claims, mongo):
         return error_message(str(e), 500)
 
 
-def me_post(params, claims, mongo):
+def me_post(params, claims, mongo, file):
 
     collection = "users"
     fields = ["age", "phone_number"]
@@ -38,6 +37,9 @@ def me_post(params, claims, mongo):
 
     image_path = ""
 
+    if "image" in params and file is not None:
+        return error_message("two images provided!")
+
     if "image" in params:
 
         formatted_string = params["image"].split(',')[1]
@@ -46,7 +48,13 @@ def me_post(params, claims, mongo):
 
         image = base64.b64decode(formatted_string)
 
-        files = {"file": ("image.jpg", image)}
+        files = {"file": ("image.png", file)}
+
+    if file is not None:
+
+        files = {"file": ("image.png", file)}
+
+    if file is not None or "image" in params:
 
         payload = {"user": claims["identity"]}
         r = requests.post("http://localhost:8082/mediaserver", files=files, data=payload)

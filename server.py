@@ -179,8 +179,11 @@ def me():
 
     if request.method == 'POST':
 
-        request.files["file"].save("/root/oniro-server/FUCK.png")
-        return me_post(request.form, claims, mongo)
+        image = None
+        if "file" in request.files:
+            image = request.files["file"]
+
+        return me_post(request.form, claims, mongo, image)
 
 
 @app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])
