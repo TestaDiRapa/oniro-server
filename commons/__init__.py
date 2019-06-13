@@ -48,7 +48,7 @@ def me_post(params, claims, mongo, file):
 
         image = base64.b64decode(formatted_string)
 
-        files = {"file": ("image.png", file)}
+        files = {"file": ("image.png", image)}
 
     if file is not None:
 
