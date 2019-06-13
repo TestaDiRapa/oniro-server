@@ -4,24 +4,33 @@ from flask import jsonify
 from numpy import hamming
 from scipy.signal import periodogram
 from statistics import mean
+from datetime import datetime
 
 
 def prepare_packet(record):
     aggregate = dict()
     preview = dict()
 
+    interval = datetime.now() - datetime.fromisoformat(record["_id"])
+
+    hours = str(interval.total_seconds()//3600)
+
+    minutes = str((interval.total_seconds() - eval(hours)*3600)//60)
+
+    aggregate["sleep_duration"] = hours + " h " + minutes + " m"
+
     aggregate["avg_spo2"] = mean(record["spo2"])
-    aggregate["plot_spo2"] = aggregate_on_interval(record["spo2"], record["spo2_rate"], 60)
+    aggregate["plot_spo2"] = aggregate_on_interval(record["spo2"], record["spo2_rate"], 3600)
 
     preview["avg_spo2"] = aggregate["avg_spo2"]
 
     aggregate["avg_hr"] = mean(record["hr"])
-    aggregate["plot_hr"] = aggregate_on_interval(record["hr"], record["hr_rate"], 60)
+    aggregate["plot_hr"] = aggregate_on_interval(record["hr"], record["hr_rate"], 3600)
 
     preview["avg_hr"] = aggregate["avg_hr"]
 
     aggregate["total_movements"] = sum(record["movements_count"])
-    aggregate["plot_movements"] = aggregate_on_interval(record["movements_count"], record["hr_rate"], 60, sum)
+    aggregate["plot_movements"] = aggregate_on_interval(record["movements_count"], record["hr_rate"], 3600, sum)
 
     f, ps = spectral_analysis(record["spo2"], record["spo2_rate"])
 
@@ -72,11 +81,10 @@ def aggregate_on_interval(signal, rate, interval, aggregator=mean):
         return signal
 
     spi = interval//rate
-    approx_len = len(signal) - len(signal) % spi
 
     i = 0
     agg_sig = []
-    while i < approx_len:
+    while i < len(signal):
         agg_sig.append(aggregator(signal[i:i+spi]))
         i += spi
 

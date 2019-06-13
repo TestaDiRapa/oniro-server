@@ -10,7 +10,7 @@ from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256 as sha256
 from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
-from user.my_recordings import my_recordings_get, my_recordings_put, processing
+from user.my_recordings import my_recordings_get, my_recordings_put, processing, send_to_doctor
 
 app = Flask(__name__)
 CORS(app)
@@ -263,6 +263,16 @@ def process_recording():
 
     return processing(rec_id, claims, mongo)
 
+
+@app.route("/user/my_recordings/send", methods=['POST'])
+@jwt_required
+def signal_recording():
+    claims = get_jwt_claims()
+    params = request.get_json
+
+    if request.method == 'GET':
+        return send_to_doctor(params, claims, mongo)
+    
 
 @app.route("/facts", methods=['GET', 'POST'])
 def add_fact():

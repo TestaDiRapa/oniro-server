@@ -2,6 +2,44 @@ from flask import jsonify
 from commons.utils import error_message, prepare_packet
 
 
+def send_to_doctor(params, claims, mongo):
+
+    if claims["type"] != "user":
+        return error_message("only users can send requests to doctors")
+
+    if "id" not in params:
+        return error_message("id is a mandatory field!")
+
+    if "doctor" not in params:
+        return error_message("doctor is a mandatory field!")
+
+    try:
+
+        doc = mongo.db.doctors.find_one({"_id": params["doctor"]})
+
+        if doc is None:
+            return error_message("doctor does not exists!")
+
+        mongo.db.doctors.find_one_and_update(
+            {
+                "_id": params["doctor"]
+            },
+            {
+                "$push": {
+                    "signals": {
+                        "cf": claims["identity"],
+                        "id": params["id"]
+                    }
+                }
+            }
+        )
+
+        return jsonify(status="ok")
+
+    except Exception as e:
+        return error_message(str(e))
+
+
 def my_recordings_get(identifier, cf, claims, mongo):
 
     if claims["type"] == "doctor":
