@@ -14,17 +14,17 @@ def prepare_packet(record):
     preview["type"] = "preview"
 
     aggregate["avg_spo2"] = mean(record["spo2"])
-    aggregate["plot_spo2"] = interval_avg(record["spo2"], record["spo2_rate"], 60)
+    aggregate["plot_spo2"] = aggregate_on_interval(record["spo2"], record["spo2_rate"], 60)
 
     preview["avg_spo2"] = aggregate["avg_spo2"]
 
     aggregate["avg_hr"] = mean(record["hr"])
-    aggregate["plot_hr"] = interval_avg(record["hr"], record["hr_rate"], 60)
+    aggregate["plot_hr"] = aggregate_on_interval(record["hr"], record["hr_rate"], 60)
 
     preview["avg_hr"] = aggregate["avg_hr"]
 
     aggregate["total_movements"] = sum(record["movements_count"])
-    aggregate["plot_movements"] = record["movements_count"]
+    aggregate["plot_movements"] = aggregate_on_interval(record["movements_count"], record["hr_rate"], 60, sum)
 
     f, ps = spectral_analysis(record["spo2"], record["spo2_rate"])
 
@@ -69,7 +69,7 @@ def error_message(message):
     return jsonify(status="error", message=message)
 
 
-def interval_avg(signal, rate, interval):
+def aggregate_on_interval(signal, rate, interval, aggregator=mean):
 
     if rate >= interval:
         return signal
@@ -80,7 +80,7 @@ def interval_avg(signal, rate, interval):
     i = 0
     agg_sig = []
     while i < approx_len:
-        agg_sig.append(mean(signal[i:i+spi]))
+        agg_sig.append(aggregator(signal[i:i+spi]))
         i += spi
 
     return agg_sig
