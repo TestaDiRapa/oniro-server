@@ -272,7 +272,7 @@ def signal_recording():
 
     if request.method == 'GET':
         return send_to_doctor(params, claims, mongo)
-    
+
 
 @app.route("/facts", methods=['GET', 'POST'])
 def add_fact():

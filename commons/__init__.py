@@ -42,6 +42,9 @@ def me_post(params, claims, mongo):
 
         image = base64.b64decode(re.sub('^ *data:image/[a-z]{3,4};base64,', '', params["image"]))
 
+        with open("image.txt", "w") as log:
+            log.write(params["image"])
+
         files = {"file": ("image.jpg", image)}
 
         payload = {"user": claims["identity"]}
