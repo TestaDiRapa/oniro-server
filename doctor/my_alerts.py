@@ -8,7 +8,7 @@ def my_alerts_get(claims, mongo):
         return error_message("only doctors can see signals!")
 
     try:
-        doc = mongo.db.doctor.find_one({"_id": claims["identity"]})
+        doc = mongo.db.doctors.find_one({"_id": claims["identity"]})
 
         if doc is None:
             return error_message("doctor does not exists!")
@@ -19,7 +19,7 @@ def my_alerts_get(claims, mongo):
         return error_message(str(e))
 
 
-def my_alerts_delete(id, cf, claims, mongo):
+def my_alerts_delete(identity, cf, claims, mongo):
 
     if claims["type"] != "doctor":
         return error_message("only doctors can delete signals!")
@@ -45,7 +45,7 @@ def my_alerts_delete(id, cf, claims, mongo):
                 "$pull": {
                     "signals": {
                         "cf": cf,
-                        "id": id
+                        "id": identity
                     }
                 }
             }
