@@ -99,7 +99,7 @@ def processing(rec_id, claims, mongo):
     if rec_id is None:
         return error_message("id is a mandatory parameter!")
 
-    #try:
+    try:
         record = mongo.db[user].find_one({"_id": rec_id})
 
         if record is None:
@@ -121,8 +121,8 @@ def processing(rec_id, claims, mongo):
 
         return error_message("ok")
 
-    #except Exception as e:
-    #    return error_message(str(e))
+    except Exception as e:
+        return error_message(str(e))
 
 
 def my_recordings_put(params, claims, mongo):
