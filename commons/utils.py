@@ -11,7 +11,7 @@ def prepare_packet(record):
     aggregate = dict()
     preview = dict()
 
-    interval = datetime.now() - datetime.fromisoformat(record["_id"])
+    interval = datetime.now() - parser.parse(record["_id"])
 
     hours = str(interval.total_seconds()//3600)
 
