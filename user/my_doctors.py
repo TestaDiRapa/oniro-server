@@ -80,7 +80,7 @@ def my_doctors_post(params, claims, mongo):
         return error_message("only users can subscribe to doctors!")
 
     if "doctor_id" not in params:
-        return error_message("doctor idffffffffffff is a mandatory parameter")
+        return error_message("doctor id is a mandatory parameter")
 
     try:
         doctor = mongo.db.doctors.find_one({'_id': params["doctor_id"]})
