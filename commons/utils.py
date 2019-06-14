@@ -1,5 +1,5 @@
 from datetime import timedelta
-from dateutil.parser import parser
+from dateutil import parser
 from flask import jsonify
 from numpy import hamming
 from scipy.signal import periodogram
