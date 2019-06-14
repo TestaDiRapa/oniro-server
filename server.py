@@ -134,7 +134,7 @@ def register_doctor():
 
         mongo.db.doctors.insert_one(
             {
-                "_id": json_data["id"],
+                "_id": str(json_data["id"]),
                 "email": json_data["email"],
                 "password": sha256.hash(json_data["password"]),
                 "name": json_data["name"],
