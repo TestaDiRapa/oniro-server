@@ -11,13 +11,13 @@ def prepare_packet(record):
     aggregate = dict()
     preview = dict()
 
-    #interval = datetime.datetime.now() - parser.parse(record["_id"])
+    interval = datetime.datetime.now() - parser.parse(record["_id"])
 
-    #hours = str(interval//3600)
+    hours = str(interval//3600)
 
-    #minutes = str((interval - eval(hours)*3600)//60)
+    minutes = str((interval - eval(hours)*3600)//60)
 
-    #aggregate["sleep_duration"] = hours + " h " + minutes + " m"
+    aggregate["sleep_duration"] = hours + " h " + minutes + " m"
 
     aggregate["avg_spo2"] = mean(record["spo2"])
     aggregate["plot_spo2"] = aggregate_on_interval(record["spo2"], record["spo2_rate"], 3600)
@@ -123,8 +123,9 @@ def aggregate_apnea_events(oxy_events, dia_events):
                 })
 
             else:
+                tmp_time = datetime.datetime.fromtimestamp((o_time.timestamp() + d_time.timestamp())/2)
                 ret.append({
-                    "time": ((o_time+d_time)/2).strftime("%x %X"),
+                    "time": tmp_time.strftime("%x %X"),
                     "duration": (oxy_ev["duration"]+dia_ev["duration"])//2,
                     "type": "consensus"
                 })
@@ -142,8 +143,9 @@ def aggregate_apnea_events(oxy_events, dia_events):
                 oxy_i += 1
 
             else:
+                tmp_time = datetime.datetime.fromtimestamp((o_time.timestamp() + d_time.timestamp()) / 2)
                 ret.append({
-                    "time": ((o_time + d_time) / 2).strftime("%x %X"),
+                    "time": tmp_time.strftime("%x %X"),
                     "duration": (oxy_ev["duration"] + dia_ev["duration"]) // 2,
                     "type": "consensus"
                 })
