@@ -11,13 +11,13 @@ def prepare_packet(record):
     aggregate = dict()
     preview = dict()
 
-    interval = datetime.datetime.now() - parser.parse(record["_id"])
+    #interval = datetime.datetime.now() - datetime.datetime.fromisoformat(record["_id"])
 
-    hours = str(interval.total_seconds()//3600)
+    #hours = str(interval.total_seconds()//3600)
 
-    minutes = str((interval.total_seconds() - eval(hours)*3600)//60)
+    #minutes = str((interval.total_seconds() - eval(hours)*3600)//60)
 
-    aggregate["sleep_duration"] = hours + " h " + minutes + " m"
+    #aggregate["sleep_duration"] = hours + " h " + minutes + " m"
 
     aggregate["avg_spo2"] = mean(record["spo2"])
     aggregate["plot_spo2"] = aggregate_on_interval(record["spo2"], record["spo2_rate"], 3600)
