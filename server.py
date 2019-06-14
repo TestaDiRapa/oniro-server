@@ -1,6 +1,7 @@
 from commons import me_get, me_post
 from commons.facts import facts_get, facts_post
 from commons.utils import error_message
+from doctor.my_alerts import my_alerts_delete, my_alerts_get
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
@@ -277,6 +278,18 @@ def signal_recording():
 
     if request.method == 'POST':
         return send_to_doctor(params, claims, mongo)
+
+
+@app.route("/doctor/my_alerts", methods=['DELETE', 'GET'])
+@jwt_required
+def get_my_requests():
+    claims = get_jwt_claims()
+
+    if request.method == 'DELETE':
+        return my_alerts_delete(request.args.get("id"), request.args.get("cf"), claims, mongo)
+
+    if request.method == 'GET':
+        return my_alerts_get(claims, mongo)
 
 
 @app.route("/facts", methods=['GET', 'POST'])
