@@ -17,7 +17,7 @@ def prepare_packet(record):
 
     #minutes = str((interval - eval(hours)*3600)//60)
 
-    aggregate["sleep_duration"] = hours + " h " + minutes + " m"
+    #aggregate["sleep_duration"] = hours + " h " + minutes + " m"
 
     aggregate["avg_spo2"] = mean(record["spo2"])
     aggregate["plot_spo2"] = aggregate_on_interval(record["spo2"], record["spo2_rate"], 3600)
