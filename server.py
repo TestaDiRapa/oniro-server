@@ -144,6 +144,7 @@ def register_doctor():
                 "phone_number": json_data["phone_number"],
                 "patients": [],
                 "patient_requests": [],
+                "signals": [],
                 "profile_picture": ""
             }
         )

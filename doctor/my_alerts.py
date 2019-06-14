@@ -13,7 +13,7 @@ def my_alerts_get(claims, mongo):
         if doc is None:
             return error_message("doctor does not exists!")
 
-        return jsonify(status="ok", signals=doc["signal"])
+        return jsonify(status="ok", signals=doc["signals"])
 
     except Exception as e:
         return error_message(str(e))
