@@ -4,14 +4,14 @@ from flask import jsonify
 from numpy import hamming
 from scipy.signal import periodogram
 from statistics import mean
-from datetime import datetime
+import datetime
 
 
 def prepare_packet(record):
     aggregate = dict()
     preview = dict()
 
-    interval = datetime.now() - datetime.fromisoformat(record["_id"])
+    interval = datetime.now() - datetime.datetime.fromisoformat(record["_id"])
 
     hours = str(interval.total_seconds()//3600)
 
