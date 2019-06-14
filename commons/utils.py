@@ -11,13 +11,13 @@ def prepare_packet(record):
     aggregate = dict()
     preview = dict()
 
-    #interval = datetime.datetime.now() - datetime.datetime.fromisoformat(record["_id"])
+    interval = datetime.datetime.now() - parser.parse(record["_id"])
 
-    #hours = str(interval.total_seconds()//3600)
+    hours = str(interval.total_seconds()//3600)
 
-    #minutes = str((interval.total_seconds() - eval(hours)*3600)//60)
+    minutes = str((interval.total_seconds() - eval(hours)*3600)//60)
 
-    #aggregate["sleep_duration"] = hours + " h " + minutes + " m"
+    aggregate["sleep_duration"] = hours + " h " + minutes + " m"
 
     aggregate["avg_spo2"] = mean(record["spo2"])
     aggregate["plot_spo2"] = aggregate_on_interval(record["spo2"], record["spo2_rate"], 3600)
@@ -111,8 +111,8 @@ def aggregate_apnea_events(oxy_events, dia_events):
     while oxy_i < len(oxy_events) and dia_i < len(dia_events):
         oxy_ev = oxy_events[oxy_i]
         dia_ev = dia_events[dia_i]
-        o_time = parser().parse(oxy_ev["time"])
-        d_time = parser().parse(dia_ev["time"])
+        o_time = parser.parse(oxy_ev["time"])
+        d_time = parser.parse(dia_ev["time"])
 
         if o_time <= d_time:
             if o_time + timedelta(seconds=oxy_ev["duration"]) < d_time:
