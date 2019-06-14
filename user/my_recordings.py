@@ -119,7 +119,7 @@ def processing(rec_id, claims, mongo):
             }
         )
 
-        return error_message("ok")
+        return jsonify(status="ok")
 
     except Exception as e:
         return error_message(str(e))
