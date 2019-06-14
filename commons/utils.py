@@ -1,5 +1,5 @@
 from datetime import timedelta
-from dateutil.parser import parser
+from dateutil import parser
 from flask import jsonify
 from numpy import hamming
 from scipy.signal import periodogram
@@ -11,7 +11,7 @@ def prepare_packet(record):
     aggregate = dict()
     preview = dict()
 
-    interval = datetime.datetime.now() - datetime.datetime.fromisoformat(record["_id"])
+    interval = datetime.datetime.now() - parser.parse(record["_id"])
 
     hours = str(interval.total_seconds()//3600)
 
