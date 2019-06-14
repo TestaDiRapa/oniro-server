@@ -275,7 +275,7 @@ def signal_recording():
     claims = get_jwt_claims()
     params = request.get_json
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         return send_to_doctor(params, claims, mongo)
 
 
