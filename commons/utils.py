@@ -7,7 +7,7 @@ from statistics import mean
 import datetime
 
 
-def prepare_packet(record):
+def prepare_packet(record, habit):
     aggregate = dict()
     preview = dict()
 
@@ -16,6 +16,8 @@ def prepare_packet(record):
     hours = str(interval//3600)
 
     minutes = str((interval - eval(hours)*3600)//60)
+
+    aggregate["habit"] = habit
 
     aggregate["sleep_duration"] = hours + " h " + minutes + " m"
 

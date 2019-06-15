@@ -1,3 +1,4 @@
+from dateutil import parser
 from flask import jsonify
 from commons.utils import error_message, prepare_packet
 
@@ -105,7 +106,13 @@ def processing(rec_id, claims, mongo):
         if record is None:
             return error_message("no records with the specified id!")
 
-        aggregate, preview = prepare_packet(record)
+        date = parser.parse(rec_id)
+
+        date_id = str(date.day) + "/" + str(date.month) + "/" + str(date.year)
+
+        habit = mongo.db[user].find_one({"_id": date_id})
+
+        aggregate, preview = prepare_packet(record, habit)
 
         mongo.db[user].find_one_and_update(
             {
