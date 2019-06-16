@@ -212,7 +212,7 @@ def get_coordinates():
         for x in mongo.db.doctors.find({}, {"name": 1,"surname": 1, "address": 1}):
             response.append((
                 {
-                    "doctor": x
+                    "doctor": x #vuoto
                 }
             ))
         if len(response) == 0:
