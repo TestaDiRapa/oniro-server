@@ -23,10 +23,10 @@ def habits_post(params, claims, mongo):
             {
                 "$set": {
                     "type": "habit",
-                    "coffee": params["caffe"],
-                    "drink": params["drink"],
-                    "isSport": params["isSport"],
-                    "isDinner": params["isCena"]
+                    "coffee": params["caffe"]["totale"],
+                    "drink": params["drink"]["totale"],
+                    "sport": params["isSport"],
+                    "dinner": params["isCena"]
                 }
             },
             upsert=True
