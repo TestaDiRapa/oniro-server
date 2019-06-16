@@ -35,7 +35,7 @@ def send_to_doctor(params, claims, mongo):
             }
         )
 
-        return jsonify(status="ok")
+        return jsonify(status="ok", message="ok")
 
     except Exception as e:
         return error_message(str(e))

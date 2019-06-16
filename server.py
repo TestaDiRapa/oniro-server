@@ -280,8 +280,6 @@ def signal_recording():
     if request.method == 'POST':
         return send_to_doctor(params, claims, mongo)
 
-    return "ok"
-
 
 @app.route("/doctor/my_alerts", methods=['DELETE', 'GET'])
 @jwt_required
