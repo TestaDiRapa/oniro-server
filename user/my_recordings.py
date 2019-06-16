@@ -14,7 +14,7 @@ def send_to_doctor(params, claims, mongo):
     if "doctor" not in params:
         return error_message("doctor is a mandatory field!")
 
-    try:
+    #try:
 
         doc = mongo.db.doctors.find_one({"_id": params["doctor"]})
 
@@ -37,8 +37,8 @@ def send_to_doctor(params, claims, mongo):
 
         return jsonify(status="ok")
 
-    except Exception as e:
-        return error_message(str(e))
+    #except Exception as e:
+     #   return error_message(str(e))
 
 
 def my_recordings_get(identifier, cf, claims, mongo):
