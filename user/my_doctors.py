@@ -45,29 +45,27 @@ def my_doctors_get(claims, mongo):
         return error_message("only users can subscribe to doctors!")
 
     try:
+        ret_keys = {"_id", "address", "email", "name", "phone_number", "profile_picture", }
         results = []
         for document in mongo.db.doctors.find({'patients': claims["identity"]}):
             tmp_dict = {}
-            for key in document:
-                if key != "password":
-                    tmp_dict[key] = document[key]
-            results.append({
-                "doctor": tmp_dict,
-                "type": "subscribed"
-            })
-
-        for document in mongo.db.doctors.find({'patient_requests': claims["identity"]}):
-            tmp_dict = {}
-
-            ret_keys = {"_id", "address", "email", "name", "phone_number", "profile_picture", "surname"}
 
             for key in document:
                 if key in ret_keys:
                     tmp_dict[key] = document[key]
-            results.append({
-                "doctor": tmp_dict,
-                "type": "requested"
-            })
+
+            tmp_dict["type"] = "subscribed"
+            results.append(tmp_dict)
+
+        for document in mongo.db.doctors.find({'patient_requests': claims["identity"]}):
+            tmp_dict = {}
+
+            for key in document:
+                if key in ret_keys:
+                    tmp_dict[key] = document[key]
+
+            tmp_dict["type"] = "requested"
+            results.append(tmp_dict)
 
         return jsonify(status="ok", message=results)
 
