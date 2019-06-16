@@ -45,7 +45,7 @@ def my_doctors_get(claims, mongo):
         return error_message("only users can subscribe to doctors!")
 
     try:
-        ret_keys = {"_id", "address", "email", "name", "phone_number", "profile_picture", }
+        ret_keys = {"_id", "address", "email", "name", "phone_number", "profile_picture", "surname"}
         results = []
         for document in mongo.db.doctors.find({'patients': claims["identity"]}):
             tmp_dict = {}
