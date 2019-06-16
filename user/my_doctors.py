@@ -7,7 +7,7 @@ def my_doctors_delete(doctor_id, claims, mongo):
         return error_message("doctor_id is a mandatory field")
 
     if claims["type"] != "user":
-        return error_message("only users can delete a their subscription to a doctor!")
+        return error_message("only users can delete their subscription to a doctor!")
 
     try:
         doctor = mongo.db.doctors.find_one({'_id': doctor_id})
