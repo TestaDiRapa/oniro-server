@@ -58,8 +58,11 @@ def my_doctors_get(claims, mongo):
 
         for document in mongo.db.doctors.find({'patient_requests': claims["identity"]}):
             tmp_dict = {}
+
+            ret_keys = {"_id", "address", "email", "name", "phone_number", "profile_picture", "surname"}
+
             for key in document:
-                if key != "password":
+                if key in ret_keys:
                     tmp_dict[key] = document[key]
             results.append({
                 "doctor": tmp_dict,
