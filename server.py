@@ -255,8 +255,6 @@ def my_recordings():
     params = request.get_json(silent=True)
     claims = get_jwt_claims()
 
-    return jsonify(fuck="FUCK")
-
     if request.method == 'PUT':
         return my_recordings_put(params, claims, mongo)
 

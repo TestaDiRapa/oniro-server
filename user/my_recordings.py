@@ -43,8 +43,6 @@ def send_to_doctor(params, claims, mongo):
 
 def my_recordings_get(identifier, cf, claims, mongo):
 
-
-
     if claims["type"] == "doctor":
         if cf is None:
             return error_message("user is a mandatory parameter!")
@@ -55,7 +53,7 @@ def my_recordings_get(identifier, cf, claims, mongo):
             if doc is None:
                 return error_message("doctor is not registered!")
 
-            return jsonify(payload=doc)
+            return jsonify(payload=doc, cf=cf)
 
             if cf not in doc["patients"]:
                 return error_message("patient not registered!")
