@@ -43,7 +43,7 @@ def send_to_doctor(params, claims, mongo):
 
 def my_recordings_get(identifier, cf, claims, mongo):
 
-    return jsonify(fuck="FUCK")
+
 
     if claims["type"] == "doctor":
         if cf is None:
