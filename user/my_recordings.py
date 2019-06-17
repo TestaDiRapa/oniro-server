@@ -35,7 +35,7 @@ def send_to_doctor(params, claims, mongo):
             }
         )
 
-        return jsonify(status="ok")
+        return jsonify(status="ok", message="ok")
 
     except Exception as e:
         return error_message(str(e))
@@ -53,6 +53,7 @@ def my_recordings_get(identifier, cf, claims, mongo):
             if doc is None:
                 return error_message("doctor is not registered!")
 
+            return jsonify(payload=doc)
             if cf not in doc["patients"]:
                 return error_message("patient not registered!")
 

@@ -209,10 +209,10 @@ def my_doctors():
 def get_coordinates():
     try:
         response = []
-        for x in mongo.db.doctors.find({}, {"_id": 1, "address": 1}):
+        for x in mongo.db.doctors.find({}, {"name": 1, "surname": 1, "address": 1}):
             response.append((
                 {
-                    "address": x
+                    "doctor": x  # vuoto
                 }
             ))
         if len(response) == 0:
@@ -275,7 +275,7 @@ def process_recording():
 @jwt_required
 def signal_recording():
     claims = get_jwt_claims()
-    params = request.get_json
+    params = request.get_json(silent=True)
 
     if request.method == 'POST':
         return send_to_doctor(params, claims, mongo)

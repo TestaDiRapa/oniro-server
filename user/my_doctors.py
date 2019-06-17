@@ -7,7 +7,7 @@ def my_doctors_delete(doctor_id, claims, mongo):
         return error_message("doctor_id is a mandatory field")
 
     if claims["type"] != "user":
-        return error_message("only users can delete a their subscription to a doctor!")
+        return error_message("only users can delete their subscription to a doctor!")
 
     try:
         doctor = mongo.db.doctors.find_one({'_id': doctor_id})
@@ -45,26 +45,27 @@ def my_doctors_get(claims, mongo):
         return error_message("only users can subscribe to doctors!")
 
     try:
+        ret_keys = {"_id", "address", "email", "name", "phone_number", "profile_picture", "surname"}
         results = []
         for document in mongo.db.doctors.find({'patients': claims["identity"]}):
             tmp_dict = {}
+
             for key in document:
-                if key != "password":
+                if key in ret_keys:
                     tmp_dict[key] = document[key]
-            results.append({
-                "doctor": tmp_dict,
-                "type": "subscribed"
-            })
+
+            tmp_dict["type"] = "subscribed"
+            results.append(tmp_dict)
 
         for document in mongo.db.doctors.find({'patient_requests': claims["identity"]}):
             tmp_dict = {}
+
             for key in document:
-                if key != "password":
+                if key in ret_keys:
                     tmp_dict[key] = document[key]
-            results.append({
-                "doctor": tmp_dict,
-                "type": "requested"
-            })
+
+            tmp_dict["type"] = "requested"
+            results.append(tmp_dict)
 
         return jsonify(status="ok", message=results)
 
