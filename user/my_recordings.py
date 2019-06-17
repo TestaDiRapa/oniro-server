@@ -53,8 +53,6 @@ def my_recordings_get(identifier, cf, claims, mongo):
             if doc is None:
                 return error_message("doctor is not registered!")
 
-            return jsonify(payload=doc["patients"], cf=cf)
-
             if cf not in doc["patients"]:
                 return error_message("patient not registered!")
 
