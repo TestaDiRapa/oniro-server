@@ -26,8 +26,8 @@ def send_to_doctor(params, claims, mongo):
                 "_id": params["id"]
             },
             {
-                "set": {
-                    "signaled": True
+                "$push": {
+                    "signaled": doc["name"] + " " + doc["surname"]
                 }
             }
         )
