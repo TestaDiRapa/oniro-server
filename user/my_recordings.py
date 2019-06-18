@@ -1,6 +1,7 @@
 from dateutil import parser
 from flask import jsonify
 from commons.utils import error_message, prepare_packet
+import traceback
 
 
 def send_to_doctor(params, claims, mongo):
@@ -140,7 +141,8 @@ def processing(rec_id, claims, mongo):
         return jsonify(status="ok")
 
     except Exception as e:
-        return error_message(str(e.__cause__))
+        traceback.print_exc(file=open("/root/oniro-server/error.log", "w"))
+        return error_message(str(e))
 
 
 def my_recordings_put(params, claims, mongo):
