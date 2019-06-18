@@ -269,7 +269,7 @@ def process_recording():
     rec_id = request.args.get("id")
     stop_time = request.args.get("stop")
 
-    return processing(rec_id, stop, claims, mongo)
+    return processing(rec_id, stop_time, claims, mongo)
 
 
 @app.route("/user/my_recordings/send", methods=['POST'])
