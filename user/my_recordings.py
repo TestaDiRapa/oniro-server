@@ -21,6 +21,17 @@ def send_to_doctor(params, claims, mongo):
         if doc is None:
             return error_message("doctor does not exists!")
 
+        mongo.db[claims["identity"]].find_one_and_update(
+            {
+                "_id": params["id"]
+            },
+            {
+                "$push": {
+                    "signaled": doc["name"] + " " + doc["surname"]
+                }
+            }
+        )
+
         mongo.db.doctors.find_one_and_update(
             {
                 "_id": params["doctor"]
@@ -68,7 +79,7 @@ def my_recordings_get(identifier, cf, claims, mongo):
         try:
             ret = []
 
-            for document in mongo.db[user].find({"type": "recording"}, {"preview": 1}):
+            for document in mongo.db[user].find({"type": "recording"}, {"preview": 1, "signaled": 1}):
 
                 ret.append(document)
 
