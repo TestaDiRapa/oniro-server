@@ -13,6 +13,9 @@ def prepare_packet(record, habit):
 
     interval = int(datetime.datetime.now().timestamp() - parser.parse(record["_id"]).timestamp())
 
+    with open("/root/oniro-server/time.log", "w") as f:
+        f.write(str(interval))
+
     hours = str(interval//3600)
 
     minutes = str((interval - eval(hours)*3600)//60)
