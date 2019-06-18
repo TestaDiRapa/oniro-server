@@ -140,7 +140,7 @@ def processing(rec_id, claims, mongo):
         return jsonify(status="ok")
 
     except Exception as e:
-        return error_message(str(e))
+        return error_message(str(e.with_traceback()))
 
 
 def my_recordings_put(params, claims, mongo):
