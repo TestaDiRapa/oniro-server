@@ -102,7 +102,7 @@ def my_recordings_get(identifier, cf, claims, mongo):
             return error_message(str(e))
 
 
-def processing(rec_id, claims, mongo):
+def processing(rec_id, stop, claims, mongo):
 
     if claims["type"] != "user":
         return error_message("only users can access their recordings!")
@@ -111,6 +111,9 @@ def processing(rec_id, claims, mongo):
 
     if rec_id is None:
         return error_message("id is a mandatory parameter!")
+
+    if stop is None:
+        return error_message("stop is a mandatory parameter!")
 
     try:
         record = mongo.db[user].find_one({"_id": rec_id})
@@ -124,7 +127,7 @@ def processing(rec_id, claims, mongo):
 
         habit = mongo.db[user].find_one({"_id": date_id})
 
-        aggregate, preview = prepare_packet(record, habit)
+        aggregate, preview = prepare_packet(record, stop, habit)
 
         mongo.db[user].find_one_and_update(
             {

@@ -7,14 +7,11 @@ from statistics import mean
 import datetime
 
 
-def prepare_packet(record, habit):
+def prepare_packet(record, stop, habit):
     aggregate = dict()
     preview = dict()
 
-    interval = int(datetime.datetime.now().timestamp() - parser.parse(record["_id"]).timestamp())
-
-    with open("/root/oniro-server/time.log", "w") as f:
-        f.write(str(interval))
+    interval = int(parser.parse(stop).timestamp() - parser.parse(record["_id"]).timestamp())
 
     hours = str(interval//3600)
 

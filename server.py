@@ -267,8 +267,9 @@ def my_recordings():
 def process_recording():
     claims = get_jwt_claims()
     rec_id = request.args.get("id")
+    stop_time = request.args.get("stop")
 
-    return processing(rec_id, claims, mongo)
+    return processing(rec_id, stop, claims, mongo)
 
 
 @app.route("/user/my_recordings/send", methods=['POST'])
