@@ -4,7 +4,10 @@ from commons.utils import error_message
 import base64
 import requests
 
-
+'''
+This method retrieves the data of a user from the database service basing on the claims from the authentication token.
+It returns the user or an error message in a JSON format.
+'''
 def me_get(claims, mongo):
     collection = "users"
     if claims["type"] == "doctor":
@@ -24,6 +27,11 @@ def me_get(claims, mongo):
         return error_message(str(e), 500)
 
 
+'''
+This method allow changing the data related to the user. It can modify more than one datum at time. If an image file is
+passed, then it's sent to the media server.
+It returns a success message or an error message to the media server.
+'''
 def me_post(params, claims, mongo, file):
 
     collection = "users"
