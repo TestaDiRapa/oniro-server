@@ -2,6 +2,10 @@ from flask import jsonify, make_response
 from commons.utils import error_message
 
 
+'''
+This method delete a patient request to a doctor or a patient subscription to a doctor, basing on the identity coded in
+the authentication token
+'''
 def my_doctors_delete(doctor_id, claims, mongo):
     if doctor_id is None:
         return error_message("doctor_id is a mandatory field")
@@ -40,6 +44,10 @@ def my_doctors_delete(doctor_id, claims, mongo):
         return make_response(str(e), 500)
 
 
+'''
+This methods returns all the requests to doctors and the doctors subscriptions related to a patient, basing on the
+identity coded in the authentication token
+'''
 def my_doctors_get(claims, mongo):
     if claims["type"] != "user":
         return error_message("only users can subscribe to doctors!")
@@ -73,6 +81,9 @@ def my_doctors_get(claims, mongo):
         return make_response(str(e), 500)
 
 
+'''
+This method allow a patient to send a doctor a subscription request
+'''
 def my_doctors_post(params, claims, mongo):
     if params is None:
         return error_message("mime type not accepted")
@@ -93,7 +104,7 @@ def my_doctors_post(params, claims, mongo):
             return error_message("already a patient of this doctor")
 
         elif claims["identity"] in doctor["patient_requests"]:
-            return error_message("already sent a message to this doctor")
+            return error_message("already sent a request to this doctor")
 
         mongo.db.doctors.update_one(
             {
