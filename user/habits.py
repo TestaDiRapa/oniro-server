@@ -3,6 +3,10 @@ from flask import jsonify
 from commons.utils import error_message
 
 
+'''
+This method creates or updates a habit object into a user collection. The user is retrieved through the claims in the 
+authentication token. The methods also check if all the parameters are in the payload
+'''
 def habits_post(params, claims, mongo):
 
     if claims["type"] != "user":
