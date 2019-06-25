@@ -16,17 +16,20 @@ from user.my_recordings import my_recordings_get, my_recordings_put, processing,
 app = Flask(__name__)
 CORS(app)
 
-# Initialize mongo client
+# Initialise mongo client
 with open("/root/oniro-server/mongourl.secret") as url_file:
     app.config["MONGO_URI"] = url_file.read()[:-1]
     mongo = PyMongo(app)
 
-# Initialize JWT
+# Initialise JWT secret key
 with open("/root/oniro-server/jwt.secret") as key_file:
     app.config["JWT_SECRET_KEY"] = key_file.read()[:-1]
     jwt = JWTManager(app)
 
 
+'''
+Decorator used to add custom claims to access token
+'''
 @jwt.user_claims_loader
 def add_claims_to_access_token(data):
     return {
@@ -35,6 +38,12 @@ def add_claims_to_access_token(data):
     }
 
 
+'''
+Login method for both patients and doctors. It expects the type of user (user or doctor) in the path and the login
+credentials as query parameters.
+On success returns an authorization token, a refresh token and their expiration in a JSON format.
+On fail returns an error message in a JSON format.
+'''
 @app.route('/login/<string:user_type>', methods=['GET'])
 def login(user_type):
     if user_type != "user" and user_type != "doctor":
@@ -76,6 +85,11 @@ def login(user_type):
         return make_response(str(e), 500)
 
 
+'''
+Method for the users registration. It expects the registration data in the payload in a JSON format.
+On success returns an authorization token, a refresh token and their expiration in a JSON format.
+On fail returns an error message in a JSON format.
+'''
 @app.route("/register/user", methods=['PUT'])
 def register_user():
     json_data = request.get_json(silent=True, cache=False)
@@ -117,6 +131,11 @@ def register_user():
         return make_response(str(e), 500)
 
 
+'''
+Method for the doctors registration. It expects the registration data in the payload in a JSON format.
+On success returns an authorization token, a refresh token and their expiration in a JSON format.
+On fail returns an error message in a JSON format.
+'''
 @app.route("/register/doctor", methods=['PUT'])
 def register_doctor():
     json_data = request.get_json(silent=True, cache=False)
@@ -161,6 +180,10 @@ def register_doctor():
         return make_response(str(e), 500)
 
 
+'''
+Method used to refresh the authentication token of a user. It needs a refresh token sent in the request's header.
+It returns a valid authentication token and its expiration in a JSON format.
+'''
 @app.route("/refresh", methods=['GET'])
 @jwt_refresh_token_required
 def refresh_token():
@@ -171,6 +194,13 @@ def refresh_token():
     return jsonify(status="ok", access_token=access_token, access_token_exp=expiration)
 
 
+'''
+This resource represents the information related to a user and can be accessed only with a valid authentication token
+In case of a GET request, then the method expects no parameters and returns all the data related to the user in a 
+JSON format
+In case of a POST request, then  the methods expects the data of the user to change in a form data format.
+It returns a success message or an error message in a JSON format.
+'''
 @app.route("/me", methods=['GET', 'POST'])
 @jwt_required
 def me():
@@ -188,6 +218,16 @@ def me():
         return me_post(request.form, claims, mongo, image)
 
 
+'''
+This resource allow a user to manage the doctors it is associated to or its requests to the doctors.
+This method requires a valid authentication token and is available to patients only.
+In case of a GET request, the methods expects no parameters and returns a list of doctors, divided in subscription
+requests and subscription or an error message, both in a JSON format.
+In case of a POST request, the methods expects a doctor id in the payload in a JSON format and allow a patient to send a 
+request to a doctor. It returns a success message or an error message in a JSON format.
+In case of a DELETE request, the methods allow a patient to delete a subscription request or a subscription. It expects
+the id of the doctor as a query parameter. It returns a success message or an error message in a JSON format.
+'''
 @app.route("/user/my_doctors", methods=['GET', 'DELETE', 'POST'])
 @jwt_required
 def my_doctors():
@@ -204,6 +244,12 @@ def my_doctors():
         return my_doctors_delete(request.args.get("doctor_id"), claims, mongo)
 
 
+'''
+This method returns all the addresses of all the doctors registered in a JSON format, along with their name and surname 
+in a JSON format. 
+In case of error it returns an error message in a JSON format.
+This method requires a valid access token and it expects no additional parameters.
+'''
 @app.route("/user/getcoordinates", methods=['GET'])
 @jwt_required
 def get_coordinates():
@@ -223,6 +269,12 @@ def get_coordinates():
         return error_message(str(e))
 
 
+'''
+This method allow a patient to insert or update its habits related to a certain day. It requires a valid authentication 
+token and can be accessed only by patients.
+It expects the habits in the payload in a JSON format and returns a success message or an error message in a JSON 
+format.
+'''
 @app.route("/user/habits", methods=['PUT'])
 @jwt_required
 def habits():
