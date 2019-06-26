@@ -7,6 +7,10 @@ from statistics import mean
 import datetime
 
 
+'''
+This function receives a packet containing the raw data about a sleep session, the stop time and the daily habit and 
+creates a packet that contains the aggregate data about that sleep session
+'''
 def prepare_packet(record, stop, habit):
     aggregate = dict()
     preview = dict()
@@ -73,10 +77,17 @@ def prepare_packet(record, stop, habit):
     return aggregate, preview
 
 
+'''
+This function incapsulates an error message into a JSON packet
+'''
 def error_message(message):
     return jsonify(status="error", message=message)
 
 
+'''
+This functions aggregates a signal, applying a certain function (default is average) in order to reduce the number of 
+samples
+'''
 def aggregate_on_interval(signal, rate, interval, aggregator=mean):
 
     if rate >= interval:
@@ -93,6 +104,9 @@ def aggregate_on_interval(signal, rate, interval, aggregator=mean):
     return agg_sig
 
 
+'''
+This function performs the spectral analysis of a signal and returns the spectral density associated to each frequency
+'''
 def spectral_analysis(signal, rate):
 
     ham = hamming(len(signal))
@@ -103,6 +117,10 @@ def spectral_analysis(signal, rate):
     return list(f), list(ps)
 
 
+'''
+This function aggregates the apnea event, in order to aggregate data from the pulse oximeter and from the accelerometer
+on the diaphragm
+'''
 def aggregate_apnea_events(oxy_events, dia_events):
 
     ret = []
