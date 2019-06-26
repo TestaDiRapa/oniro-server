@@ -1,7 +1,9 @@
 from commons.utils import error_message
 from flask import jsonify
 
-
+'''
+This method allow a doctor to see all the reports sent from its patients
+'''
 def my_alerts_get(claims, mongo):
 
     if claims["type"] != "doctor":
@@ -19,6 +21,9 @@ def my_alerts_get(claims, mongo):
         return error_message(str(e))
 
 
+'''
+This method allow a doctor to delete a report from a patient, given the patient cf and the recording id
+'''
 def my_alerts_delete(identity, cf, claims, mongo):
 
     if claims["type"] != "doctor":

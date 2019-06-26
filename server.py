@@ -338,6 +338,13 @@ def my_recordings():
         return my_recordings_get(request.args.get("id"), request.args.get("cf"), claims, mongo)
 
 
+'''
+This method triggers the elaboration of the raw data of a recording. It requires a valid authentication token and can be
+accessed only by users.
+This method accepts only GET requests with two mandatory query parameters:
+    - id: the id of the recording to elaborate
+    - stop: the timestamp (in ISO format) of the time the recording stopped
+'''
 @app.route("/user/my_recordings/process", methods=['GET'])
 @jwt_required
 def process_recording():
@@ -348,6 +355,13 @@ def process_recording():
     return processing(rec_id, stop_time, claims, mongo)
 
 
+'''
+This method allow a patient to report a sleep recording to a doctor. It requires a valid authentication token and can be 
+accessed only by a user. 
+The method accepts only POST requests and expects a payload in a JSON format that contains the id of the recording to 
+report and the id of the doctor to send the report to.
+It returns a success or an error mesasge in a JSON format.
+'''
 @app.route("/user/my_recordings/send", methods=['POST'])
 @jwt_required
 def signal_recording():
@@ -358,6 +372,14 @@ def signal_recording():
         return send_to_doctor(params, claims, mongo)
 
 
+'''
+This method allow a doctor to manage all its reports. It requires a valid authentication token and can only be accessed 
+by a doctor.
+In case of a DELETE request, the method expects a patient cf and a recording id as query parameters and delete the 
+report related to those parameters. It returns a success or an error message in a JSON format.
+In case of a GET request, the method returns all the reports associated to the doctor (whose identity is stored in the
+authentication token) in a JSON format or an error message in a JSON format.
+'''
 @app.route("/doctor/my_alerts", methods=['DELETE', 'GET'])
 @jwt_required
 def get_my_requests():
