@@ -2,6 +2,9 @@ from flask import jsonify, make_response
 from commons.utils import error_message
 
 
+'''
+This method allow a doctor to remove a subscribed patient or to refuse a subscription request.
+'''
 def my_patients_delete(patient_cf, claims, mongo):
     if patient_cf is None:
         return error_message("patient_cf is a mandatory field")
@@ -33,6 +36,10 @@ def my_patients_delete(patient_cf, claims, mongo):
         return make_response(str(e), 500)
 
 
+'''
+This method returns all the patients associated to a doctor, both the ones that are already subscribed and the ones
+that sent the request and have still to be accepted.
+'''
 def my_patients_get(claims, mongo):
     if claims["type"] != "doctor":
         return error_message("only doctors can see their patients!")
@@ -71,6 +78,9 @@ def my_patients_get(claims, mongo):
         return make_response(str(e), 500)
 
 
+'''
+This method allows a doctor to accept a patient request, registering it as subscribed
+'''
 def my_patients_post(params, claims, mongo):
     if params is None:
         return error_message("mime type not accepted")
