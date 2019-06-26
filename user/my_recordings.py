@@ -4,6 +4,9 @@ from commons.utils import error_message, prepare_packet
 import traceback
 
 
+'''
+This method adds a record to the doctors' report, so it can receive notification about it
+'''
 def send_to_doctor(params, claims, mongo):
 
     if claims["type"] != "user":
@@ -53,6 +56,11 @@ def send_to_doctor(params, claims, mongo):
         return error_message(str(e))
 
 
+'''
+This method allow a patient to get all of its recordings' previews (if no recording id is specified) or a detailed
+recording (if the id is specified). It also allow a doctor to get recordings' previews and detailed recordings related
+to one of its patients. In this case, the cf parameter is mandatory.
+'''
 def my_recordings_get(identifier, cf, claims, mongo):
 
     if claims["type"] == "doctor":
@@ -102,6 +110,9 @@ def my_recordings_get(identifier, cf, claims, mongo):
             return error_message(str(e))
 
 
+'''
+This method receives a recording id and process all the raw data to further elaborate them.
+'''
 def processing(rec_id, stop, claims, mongo):
 
     if claims["type"] != "user":
@@ -148,6 +159,10 @@ def processing(rec_id, stop, claims, mongo):
         return error_message(str(e))
 
 
+'''
+This method receives a chunk of a sleep recordings and adds the data to the object of the database that contains the raw
+data related to that recording. If such object does not exists, it creates it.
+'''
 def my_recordings_put(params, claims, mongo):
 
     if claims["type"] != "user":

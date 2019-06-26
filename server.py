@@ -271,7 +271,7 @@ def get_coordinates():
 
 '''
 This method allow a patient to insert or update its habits related to a certain day. It requires a valid authentication 
-token and can be accessed only by patients.
+token and can be only accessed by patients.
 It expects the habits in the payload in a JSON format and returns a success message or an error message in a JSON 
 format.
 '''
@@ -285,6 +285,16 @@ def habits():
         return habits_post(params, claims, mongo)
 
 
+'''
+This method allow a doctor to manage its patients. It requires a valid authentication token anc can be only accessed by 
+patients. 
+In case of a GET request, the methods expects no parameters and returns a list of the patient associated to the doctor, 
+divided in subscription requests and subscribed or an error message, both in a JSON format.
+In case of a POST request, the methods expects a patient cf in the payload in a JSON format and allow a doctor to accept 
+a request from a patient. It returns a success message or an error message in a JSON format.
+In case of a DELETE request, the methods allow a doctor to delete a subscription request or a subscription. It expects
+the cf of the patient as a query parameter. It returns a success message or an error message in a JSON format.
+'''
 @app.route("/doctor/my_patients", methods=['GET', 'DELETE', 'POST'])
 @jwt_required
 def my_patients():
@@ -301,6 +311,20 @@ def my_patients():
         return my_patients_delete(request.args.get("patient_cf"), claims, mongo)
 
 
+'''
+This method manages the sleep recordings data. It requires a valid authentication token. The PUT method can be accessed 
+only by patient, while the GET method can be accessed both by patients and doctors
+The patient can use the GET method as such:
+    - if the id query parameter is not specified, then the response will contain all the previews of the recordings 
+    associated to that user in a JSON format.
+    - if the id query parameter is specified, then the response will contain all the elaborated data of the recording
+    with the specified id
+The doctor can use the GET method in the same way, but can access just the data of its patients and must specify also 
+the cf of the patients he wants to see the data of.
+In case of a PUT request, the method expects a chunk of the data related to a sleep recording session in the body in a 
+JSON format in order to add them to the other data associated to the same session. It will return a success or an error
+message in a JSON format.
+'''
 @app.route("/user/my_recordings", methods=['PUT', 'GET'])
 @jwt_required
 def my_recordings():
