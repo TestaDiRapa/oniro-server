@@ -4,6 +4,27 @@ from commons.utils import error_message
 import base64
 import requests
 
+
+'''
+Returns a list containing all the doctors' addresses
+'''
+def get_coordinates(mongo):
+    try:
+        response = []
+        for x in mongo.db.doctors.find({}, {"name": 1, "surname": 1, "address": 1}):
+            response.append((
+                {
+                    "doctor": x  # vuoto
+                }
+            ))
+        if len(response) == 0:
+            return error_message("empty list!")
+        return jsonify(status='ok', payload=response)
+
+    except Exception as e:
+        return error_message(str(e))
+
+
 '''
 This method retrieves the data of a user from the database service basing on the claims from the authentication token.
 It returns the user or an error message in a JSON format.

@@ -1,6 +1,6 @@
-from commons import me_get, me_post
+from commons import get_coordinates, me_get, me_post
+from commons.authentication import doctor_register, login, user_register
 from commons.facts import facts_get, facts_post
-from commons.utils import error_message
 from doctor.my_alerts import my_alerts_delete, my_alerts_get
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
 from flask import Flask, jsonify, request, make_response
@@ -8,7 +8,6 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, decode_token, \
     jwt_refresh_token_required, get_jwt_claims, get_jwt_identity
 from flask_pymongo import PyMongo
-from passlib.hash import pbkdf2_sha256 as sha256
 from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
 from user.my_recordings import my_recordings_get, my_recordings_put, processing, send_to_doctor
@@ -55,34 +54,21 @@ def login(user_type):
     elif user_type == "doctor":
         key = "id"
 
-    params = {
-        key: request.args.get(key),
-        "password": request.args.get("password")
-    }
+    identity = request.args.get(key)
+    password = request.args.get("password")
 
-    if key not in params or "password" not in params:
-        return error_message(key + " and password are mandatory fields!")
+    result, message = login(user_type, identity, password, mongo)
 
-    try:
-        user = mongo.db[user_type+"s"].find_one({"_id": params[key]})
+    if not result:
+        return message
 
-        if user is None:
-            return error_message("user does not exists!")
+    access_token = create_access_token({"username": identity, "type": user_type})
+    expiration = decode_token(access_token)["exp"]
+    r_token = create_refresh_token({"username": identity, "type": user_type})
+    refresh_expiration = decode_token(r_token)["exp"]
 
-        pwd = user["password"]
-        if not sha256.verify(params["password"], pwd):
-            return error_message("password is not correct")
-
-        access_token = create_access_token({"username": params[key], "type": user_type})
-        expiration = decode_token(access_token)["exp"]
-        r_token = create_refresh_token({"username": params[key], "type": user_type})
-        refresh_expiration = decode_token(r_token)["exp"]
-
-        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
-                       refresh_token_exp=refresh_expiration)
-
-    except Exception as e:
-        return make_response(str(e), 500)
+    return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                   refresh_token_exp=refresh_expiration)
 
 
 '''
@@ -93,42 +79,19 @@ On fail returns an error message in a JSON format.
 @app.route("/register/user", methods=['PUT'])
 def register_user():
     json_data = request.get_json(silent=True, cache=False)
-    if json_data is None:
-        return error_message("mime type not accepted")
 
-    fields = ["cf", "name", "surname", "age", "email", "password", "phone_number"]
+    result, message = user_register(json_data, mongo)
 
-    for field in fields:
-        if field not in json_data:
-            return error_message(field + " is a mandatory field")
+    if not result:
+        return message
 
-    try:
-        if mongo.db.users.find_one({'_id': json_data["cf"]}) is not None:
-            return error_message("a user with this CF already exists!")
+    access_token = create_access_token({"username": json_data["cf"], "type": "user"})
+    expiration = decode_token(access_token)["exp"]
+    r_token = create_refresh_token({"username": json_data["cf"], "type": "user"})
+    refresh_expiration = decode_token(r_token)["exp"]
 
-        mongo.db.users.insert_one(
-            {
-                "_id": json_data["cf"],
-                "email": json_data["email"],
-                "password": sha256.hash(json_data["password"]),
-                "name": json_data["name"],
-                "surname": json_data["surname"],
-                "age": json_data["age"],
-                "phone_number": json_data["phone_number"],
-                "profile_picture": ""
-            }
-        )
-
-        access_token = create_access_token({"username": json_data["cf"], "type": "user"})
-        expiration = decode_token(access_token)["exp"]
-        r_token = create_refresh_token({"username": json_data["cf"], "type": "user"})
-        refresh_expiration = decode_token(r_token)["exp"]
-
-        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
-                       refresh_token_exp=refresh_expiration)
-
-    except Exception as e:
-        return make_response(str(e), 500)
+    return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                   refresh_token_exp=refresh_expiration)
 
 
 '''
@@ -139,45 +102,19 @@ On fail returns an error message in a JSON format.
 @app.route("/register/doctor", methods=['PUT'])
 def register_doctor():
     json_data = request.get_json(silent=True, cache=False)
-    if json_data is None:
-        return error_message("mime type not accepted")
 
-    fields = ["id", "email", "password", "name", "surname", "address", "phone_number"]
+    result, message = doctor_register(json_data, mongo)
 
-    for field in fields:
-        if field not in json_data:
-            return error_message(field + " is a mandatory field")
+    if not result:
+        return message
 
-    try:
-        if mongo.db.doctors.find_one({'_id': json_data["id"]}) is not None:
-            return error_message("a user with this id already exists!")
+    access_token = create_access_token({"username": json_data["id"], "type": "doctor"})
+    expiration = decode_token(access_token)["exp"]
+    r_token = create_refresh_token({"username": json_data["id"], "type": "doctor"})
+    refresh_expiration = decode_token(r_token)["exp"]
 
-        mongo.db.doctors.insert_one(
-            {
-                "_id": str(json_data["id"]),
-                "email": json_data["email"],
-                "password": sha256.hash(json_data["password"]),
-                "name": json_data["name"],
-                "surname": json_data["surname"],
-                "address": json_data["address"],
-                "phone_number": json_data["phone_number"],
-                "patients": [],
-                "patient_requests": [],
-                "signals": [],
-                "profile_picture": ""
-            }
-        )
-
-        access_token = create_access_token({"username": json_data["id"], "type": "doctor"})
-        expiration = decode_token(access_token)["exp"]
-        r_token = create_refresh_token({"username": json_data["id"], "type": "doctor"})
-        refresh_expiration = decode_token(r_token)["exp"]
-
-        return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
-                       refresh_token_exp=refresh_expiration)
-
-    except Exception as e:
-        return make_response(str(e), 500)
+    return jsonify(status="ok", access_token=access_token, access_token_exp=expiration, refresh_token=r_token,
+                   refresh_token_exp=refresh_expiration)
 
 
 '''
@@ -253,20 +190,8 @@ This method requires a valid access token and it expects no additional parameter
 @app.route("/user/getcoordinates", methods=['GET'])
 @jwt_required
 def get_coordinates():
-    try:
-        response = []
-        for x in mongo.db.doctors.find({}, {"name": 1, "surname": 1, "address": 1}):
-            response.append((
-                {
-                    "doctor": x  # vuoto
-                }
-            ))
-        if len(response) == 0:
-            return error_message("empty list!")
-        return jsonify(status='ok', payload=response)
 
-    except Exception as e:
-        return error_message(str(e))
+    return get_coordinates(mongo)
 
 
 '''
