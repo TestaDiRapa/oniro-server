@@ -316,15 +316,11 @@ def get_my_requests():
         return my_alerts_get(claims, mongo)
 
 
-@app.route("/facts", methods=['GET', 'POST'])
+@app.route("/facts", methods=['GET'])
 def add_fact():
-    params = request.get_json(silent=True)
 
     if request.method == 'GET':
         return facts_get(mongo)
-
-    if request.method == 'POST':
-        return facts_post(params, mongo)
 
 
 if __name__ == "__main__":
