@@ -183,7 +183,7 @@ def my_doctors():
 
 '''
 This method returns all the addresses of all the doctors registered in a JSON format, along with their name and surname 
-in a JSON format. This method requires a valid authentication token.
+in a JSON format. This method requires a valid authentication token.    
 In case of error it returns an error message in a JSON format.
 This method requires a valid access token and it expects no additional parameters.
 '''
@@ -270,14 +270,13 @@ This method accepts only GET requests with two mandatory query parameters:
     - id: the id of the recording to elaborate
     - stop: the timestamp (in ISO format) of the time the recording stopped
 '''
-@app.route("/user/my_recordings/process", methods=['GET'])
+@app.route("/user/my_recordings/process", methods=['POST'])
 @jwt_required
 def process_recording():
     claims = get_jwt_claims()
-    rec_id = request.args.get("id")
-    stop_time = request.args.get("stop")
+    params = request.get_json(silent=True)
 
-    return processing(rec_id, stop_time, claims, mongo)
+    return processing(params, claims, mongo)
 
 
 '''

@@ -113,18 +113,21 @@ def my_recordings_get(identifier, cf, claims, mongo):
 '''
 This method receives a recording id and process all the raw data to further elaborate them.
 '''
-def processing(rec_id, stop, claims, mongo):
+def processing(params, claims, mongo):
 
     if claims["type"] != "user":
         return error_message("only users can access their recordings!")
 
     user = claims["identity"]
 
-    if rec_id is None:
+    if "id" not in params:
         return error_message("id is a mandatory parameter!")
 
-    if stop is None:
+    if "stop" not in params:
         return error_message("stop is a mandatory parameter!")
+
+    rec_id = params["id"]
+    stop = params["stop"]
 
     try:
         record = mongo.db[user].find_one({"_id": rec_id})
