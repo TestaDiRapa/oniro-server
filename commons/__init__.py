@@ -8,7 +8,7 @@ import requests
 '''
 Returns a list containing all the doctors' addresses
 '''
-def get_coordinates(mongo):
+def coordinates_get(mongo):
     try:
         response = []
         for x in mongo.db.doctors.find({}, {"name": 1, "surname": 1, "address": 1}):

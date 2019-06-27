@@ -1,4 +1,4 @@
-from commons import get_coordinates, me_get, me_post
+from commons import coordinates_get, me_get, me_post
 from commons.facts import facts_get, facts_post
 from doctor.my_alerts import my_alerts_delete, my_alerts_get
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
@@ -183,7 +183,7 @@ def my_doctors():
 
 '''
 This method returns all the addresses of all the doctors registered in a JSON format, along with their name and surname 
-in a JSON format. 
+in a JSON format. This method requires a valid authentication token.
 In case of error it returns an error message in a JSON format.
 This method requires a valid access token and it expects no additional parameters.
 '''
@@ -191,7 +191,7 @@ This method requires a valid access token and it expects no additional parameter
 @jwt_required
 def get_coordinates():
 
-    return get_coordinates(mongo)
+    return coordinates_get(mongo)
 
 
 '''
