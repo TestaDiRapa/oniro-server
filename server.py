@@ -1,5 +1,4 @@
 from commons import get_coordinates, me_get, me_post
-from commons.authentication import doctor_register, login, user_register
 from commons.facts import facts_get, facts_post
 from doctor.my_alerts import my_alerts_delete, my_alerts_get
 from doctor.my_patients import my_patients_delete, my_patients_get, my_patients_post
@@ -11,6 +10,7 @@ from flask_pymongo import PyMongo
 from user.habits import habits_post
 from user.my_doctors import my_doctors_post, my_doctors_get, my_doctors_delete
 from user.my_recordings import my_recordings_get, my_recordings_put, processing, send_to_doctor
+import commons.authentication
 
 app = Flask(__name__)
 CORS(app)
@@ -57,7 +57,7 @@ def login(user_type):
     identity = request.args.get(key)
     password = request.args.get("password")
 
-    result, message = login(user_type, identity, password, mongo)
+    result, message = commons.authentication.login(user_type, identity, password, mongo)
 
     if not result:
         return message
@@ -80,7 +80,7 @@ On fail returns an error message in a JSON format.
 def register_user():
     json_data = request.get_json(silent=True, cache=False)
 
-    result, message = user_register(json_data, mongo)
+    result, message = commons.authentication.user_register(json_data, mongo)
 
     if not result:
         return message
@@ -103,7 +103,7 @@ On fail returns an error message in a JSON format.
 def register_doctor():
     json_data = request.get_json(silent=True, cache=False)
 
-    result, message = doctor_register(json_data, mongo)
+    result, message = commons.authentication.doctor_register(json_data, mongo)
 
     if not result:
         return message
