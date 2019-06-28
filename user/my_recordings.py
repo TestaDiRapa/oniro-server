@@ -120,6 +120,9 @@ def processing(params, claims, mongo):
 
     user = claims["identity"]
 
+    if params is None:
+        return error_message("No parameters sent!")
+
     if "id" not in params:
         return error_message("id is a mandatory parameter!")
 
