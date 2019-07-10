@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/root/oniro-server/user/my_recordings.py", line 127, in processing
+    aggregate, preview = prepare_packet(record, habit)
+  File "/root/oniro-server/commons/utils.py", line 18, in prepare_packet
+    minutes = str((interval - eval(hours)*3600)//60)
+  File "<string>", line 1
+    0:00:00.270833
+     ^
+SyntaxError: invalid syntax
